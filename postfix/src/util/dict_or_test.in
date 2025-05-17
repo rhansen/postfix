@@ -1,0 +1,19 @@
+${VALGRIND} ./dict_open 'or:{inline:{k1=v1,k2=v2a},inline:{k2=v2b,k3=v3}}' read <<EOF
+get k0
+get k1
+get k2
+get k3
+EOF
+${VALGRIND} ./dict_open 'or:{inline:{k1=v1},fail:fail}' read <<EOF
+get k0
+get k1
+EOF
+${VALGRIND} ./dict_open 'or:{fail:fail,static:value}' read <<EOF
+get k
+EOF
+${VALGRIND} ./dict_open 'or:{}' read <<EOF
+get k
+EOF
+${VALGRIND} ./dict_open 'or:{static:{} static:nonempty}' read <<EOF
+get k
+EOF

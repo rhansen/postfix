@@ -301,6 +301,93 @@
 /* .IP "\fBmysql\fR (read-only)"
 /*	MySQL database client.  Available on systems with support
 /*	for MySQL databases.  This is described in \fBmysql_table\fR(5).
+/* .IP "\fBor\fR (read\-only)"
+/*	.RS
+/*	Searches zero or more underlying tables and returns the first
+/*	matching value.  The table name syntax is the same as for
+/*	.B pipemap
+/*	tables.  The
+/*	.B or
+/*	table type is similar to the
+/*	.B unionmap
+/*	table type, except:
+/*	.IP \(bu
+/*	The underlying tables are searched one at a time in the given
+/*	order, not simultaneously.
+/*	.IP \(bu
+/*	The search has short-circuit semantics: the search stops when
+/*	a result is found or the list of underlying tables is
+/*	exhausted.  The
+/*	.B unionmap
+/*	type always queries all underlying tables.
+/*	.IP \(bu
+/*	Only the first result is returned, not all results.
+/*	.PP
+/*	If an underlying table returns an error, that error is
+/*	returned; the search does not continue to the next table in
+/*	the list.  (The
+/*	.B or
+/*	table type is not intended for error failover.)
+/*
+/*	The
+/*	.B or
+/*	table type is useful for avoiding slow, expensive, or
+/*	unreliable lookups when they are not needed.  For example:
+/*
+/*	.in +4n
+/*	.EX
+/*	relay_domains =
+/*	  or:{
+/*	    # A pcre table is used to ensure that subdomain lookups
+/*	    # don't fall through to the ldap table below.
+/*	    pcre:{
+/*	      {/(^|\e.)\eQa.example\eE$$/ OK}
+/*	      {/(^|\e.)\eQb.example\eE$$/ OK}
+/*	    }
+/*	    # It is OK if the LDAP server is unavailable; these
+/*	    # domains are for testing purposes.
+/*	    ldap:/etc/postfix/best_effort_domains.cf
+/*	  }
+/*	.EE
+/*	.in
+/*
+/*	The
+/*	.B or
+/*	table type is also useful for inserting narrow exceptions into
+/*	specific checks.  For example:
+/*
+/*	.in +4n
+/*	.EX
+/*	smtpd_client_restrictions =
+/*	  check_client_access or:{
+/*	    inline:{a.example=DUNNO}
+/*	    cidr:{{192.0.2.0/24 REJECT}}
+/*	  }
+/*	  check_client_access or:{
+/*	    inline:{b.example=DUNNO}
+/*	    static:{reject_rbl_client zen.spamhaus.org=127.0.0.[2..11]}
+/*	  }
+/*	  check_client_access or:{
+/*	    inline:{c.example=DUNNO}
+/*	    static:{check_policy_service unix:private/custom-policy}
+/*	  }
+/*	.EE
+/*	.in
+/*
+/*	The
+/*	.B or
+/*	table type is also useful for testing various
+/*	.B *_maps
+/*	parameters:
+/*
+/*	.in +4n
+/*	.EX
+/*	postmap -q test@example.com "or:{$(postconf -hx virtual_alias_maps)}"
+/*	.EE
+/*	.in
+/*
+/*	This feature is available with Postfix 3.11 and later.
+/*	.RE
 /* .IP "\fBpcre\fR (read-only)"
 /*	A lookup table based on Perl Compatible Regular Expressions.
 /*	The file format is described in \fBpcre_table\fR(5).

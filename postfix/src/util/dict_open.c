@@ -338,6 +338,7 @@
 #include <dict.h>
 #include <dict_cdb.h>
 #include <dict_env.h>
+#include <dict_or.h>
 #include <dict_unix.h>
 #include <dict_tcp.h>
 #include <dict_sdbm.h>
@@ -415,6 +416,7 @@ static const DICT_OPEN_INFO dict_open_info[] = {
     DICT_TYPE_LMDB, dict_lmdb_open, mkmap_lmdb_open,
 #endif
 #endif					/* !USE_DYNAMIC_MAPS */
+    DICT_TYPE_OR, dict_or_open, 0,
     0,
 };
 

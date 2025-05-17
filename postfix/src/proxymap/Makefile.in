@@ -52,6 +52,7 @@ proxymap.o: ../../include/argv.h
 proxymap.o: ../../include/attr.h
 proxymap.o: ../../include/check_arg.h
 proxymap.o: ../../include/dict.h
+proxymap.o: ../../include/dict_or.h
 proxymap.o: ../../include/dict_pipe.h
 proxymap.o: ../../include/dict_proxy.h
 proxymap.o: ../../include/dict_union.h

@@ -232,6 +232,7 @@
 #include <htable.h>
 #include <stringops.h>
 #include <dict.h>
+#include <dict_or.h>
 #include <dict_pipe.h>
 #include <dict_union.h>
 
@@ -307,6 +308,7 @@ static char *get_nested_dict_name(char *type_name)
     }      *prefix, prefixes[] = {
 	DICT_TYPE_UNION ":", (sizeof(DICT_TYPE_UNION ":") - 1),
 	DICT_TYPE_PIPE ":", (sizeof(DICT_TYPE_PIPE ":") - 1),
+	DICT_TYPE_OR ":", (sizeof(DICT_TYPE_OR ":") - 1),
     };
 
 #define COUNT_OF(x) (sizeof(x)/sizeof((x)[0]))

@@ -1,0 +1,28 @@
++ ./dict_open or:{inline:{k1=v1,k2=v2a},inline:{k2=v2b,k3=v3}} read
+owner=trusted (uid=2147483647)
+> get k0
+k0: not found
+> get k1
+k1=v1
+> get k2
+k2=v2a
+> get k3
+k3=v3
++ ./dict_open or:{inline:{k1=v1},fail:fail} read
+owner=trusted (uid=2147483647)
+> get k0
+k0: error
+> get k1
+k1=v1
++ ./dict_open or:{fail:fail,static:value} read
+owner=trusted (uid=2147483647)
+> get k
+k: error
++ ./dict_open or:{} read
+owner=trusted (uid=0)
+> get k
+k: not found
++ ./dict_open or:{static:{} static:nonempty} read
+owner=trusted (uid=2147483647)
+> get k
+k=
