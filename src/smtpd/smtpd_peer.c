@@ -669,7 +669,7 @@ void    smtpd_peer_init(SMTPD_STATE *state)
 
 void    smtpd_peer_reset(SMTPD_STATE *state)
 {
-#define MYFREE_AND_ZERO(e) do { myfree(e); (e) = 0; } while (0);
+#define MYFREE_AND_ZERO(e) do { myfree(e); (e) = 0; } while (0)
 
     if (state->name)
 	MYFREE_AND_ZERO(state->name);

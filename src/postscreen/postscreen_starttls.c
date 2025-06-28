@@ -93,7 +93,7 @@ static char *psc_tlsp_service = 0;
 #define PSC_STARTTLS_EVENT_ERR_RESUME_RETURN() do { \
 	event_disable_readwrite(vstream_fileno(tlsproxy_stream)); \
 	PSC_STARTTLS_EVENT_RESUME_RETURN(starttls_state); \
-    } while (0);
+    } while (0)
 
 /* Resume the dummy SMTP engine, possibly after swapping streams */
 

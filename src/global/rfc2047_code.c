@@ -475,10 +475,10 @@ static int validates_charset(const TEST_CASE *tp)
 	int _n; \
 	for (_n = (min); _n <= (max); _n++) \
 	    FD_SET(_n, (map)); \
-    } while (0);
+    } while (0)
 #define SET_SINGLE(map, n) do { \
 	FD_SET(n, (map)); \
-    } while (0);
+    } while (0)
 
     /*
      * Initialize a bitmap with characters that are allowed in a charset

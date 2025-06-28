@@ -112,7 +112,7 @@ VSTRING *dict_file_to_buf(DICT *dict, const char *pathnames)
 	argv_free(argv); \
 	if (fp) vstream_fclose(fp); \
 	return (retval); \
-    } while (0);
+    } while (0)
 
     argv = argv_split(pathnames, CHARS_COMMA_SP);
     if (argv->argc == 0) {

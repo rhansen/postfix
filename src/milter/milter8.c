@@ -1723,7 +1723,7 @@ static void milter8_connect(MILTER8 *milter)
 	myfree(transport); \
 	milter_error(milter); \
 	return; \
-    } while (0);
+    } while (0)
 
     transport = mystrdup(milter->m.name);
     if ((endpoint = split_at(transport, ':')) == 0

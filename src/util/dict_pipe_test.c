@@ -63,7 +63,7 @@ static int valid_refcounts_for_good_composite_syntax(void)
 	vstring_free(composite_spec); \
 	argv_free(reg_component_specs); \
 	return (x); \
-    } while (0);
+    } while (0)
 
     if (LEN(msg_buf) > 0) {
 	msg_warn("unexpected dict_open() warning: got %s", STR(msg_buf));
@@ -113,7 +113,7 @@ static int valid_refcounts_for_bad_composite_syntax(void)
 	vstring_free(composite_spec); \
 	argv_free(reg_component_specs); \
 	return (x); \
-    } while (0);
+    } while (0)
 
     if (LEN(msg_buf) == 0) {
 	msg_warn("missing dict_open() warning: want '%s'", want_msg);

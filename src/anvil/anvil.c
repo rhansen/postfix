@@ -502,7 +502,7 @@ static time_t max_cache_time;		/* time of peak size */
 		_max.ident, ctime(&_max.when) + 4); \
 	    _max.value = 0; \
 	} \
-    } while (0);
+    } while (0)
 
 #define ANVIL_MAX_COUNT_REPORT(_max, _name) \
     do { \
@@ -511,7 +511,7 @@ static time_t max_cache_time;		/* time of peak size */
 		_max.value, _max.ident, ctime(&_max.when) + 4); \
 	    _max.value = 0; \
 	} \
-    } while (0);
+    } while (0)
 
  /*
   * Silly little macros.

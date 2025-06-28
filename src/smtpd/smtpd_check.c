@@ -4049,7 +4049,7 @@ static int check_policy_service(SMTPD_STATE *state, const char *server,
 	    xtext_quote(coded_CN_buf, CN, ""); \
 	    coded_CN = STR(coded_CN_buf); \
 	} \
-    } while (0);
+    } while (0)
 
     ENCODE_CN(subject, subject_buf, state->tls_context->peer_CN);
     ENCODE_CN(issuer, issuer_buf, state->tls_context->issuer_CN);

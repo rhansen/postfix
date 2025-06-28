@@ -365,7 +365,7 @@ static const char *dict_mongodb_lookup(DICT *dict, const char *name)
 #define DICT_MONGODB_LOOKUP_ERR_RETURN(err) do { \
 	dict_mongodb->dict.error = (err); \
 	DICT_MONGODB_LOOKUP_RETURN((char *) 0); \
-} while (0);
+} while (0)
 
     /* Pass through any error, and return the specified value. */
 #define DICT_MONGODB_LOOKUP_RETURN(val) do { \
@@ -543,7 +543,7 @@ DICT   *dict_mongodb_open(const char *name, int open_flags, int dict_flags)
 	if (uri) mongoc_uri_destroy(uri); \
 	dict_mongodb_close(&dict_mongodb->dict); \
 	return (_d); \
-    } while (0);
+    } while (0)
 
     uri = mongoc_uri_new_with_error(dict_mongodb->uri, &error);
     if (!uri)
