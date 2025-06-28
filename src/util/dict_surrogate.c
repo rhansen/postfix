@@ -4,7 +4,7 @@
 /* SUMMARY
 /*	surrogate table for graceful "open" failure
 /* SYNOPSIS
-/*	#include <dict_surrogate.h>
+/*	#include <dict.h>
 /*
 /*	DICT	*dict_surrogate(dict_type, dict_name,
 /*				open_flags, dict_flags,
