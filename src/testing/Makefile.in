@@ -1,9 +1,9 @@
 SHELL	= /bin/sh
-SRCS	= nosleep.c dict_test_helper.c
-LIB_OBJ	= dict_test_helper.o
+SRCS	= nosleep.c dict_test_helper.c test_support.c
+LIB_OBJ	= dict_test_helper.o test_support.o
 MOCK_OBJ=
 TEST_OBJ=
-HDRS	= dict_test_helper.h
+HDRS	= dict_test_helper.h test_support.h
 TESTSRC	=
 DEFS	= -I. -I$(INC_DIR) -D$(SYSTYPE)
 CFLAGS	= $(DEBUG) $(OPT) $(DEFS)
@@ -87,4 +87,9 @@ dict_test_helper.o: ../../include/vstream.h
 dict_test_helper.o: ../../include/vstring.h
 dict_test_helper.o: dict_test_helper.c
 dict_test_helper.o: dict_test_helper.h
+dict_test_helper.o: test_support.h
 nosleep.o: nosleep.c
+test_support.o: ../../include/msg.h
+test_support.o: ../../include/sys_defs.h
+test_support.o: test_support.c
+test_support.o: test_support.h
