@@ -18,7 +18,8 @@
 /*	typedef struct TEST_CASE {
 /* .in +4
 /*	const char *label;
-/*	TEST_RESULT (*action) (void);
+/*	TEST_RESULT (*action) (void *arg);
+/*	void	*arg;
 /* .in -4
 /*	} TEST_CASE;
 /*
@@ -27,6 +28,9 @@
 /* DESCRIPTION
 /*	.B TEST_CASE.label
 /*	is a name that is logged when the test case runs.
+/*	.B TEST_CASE.arg
+/*	is optional; it is passed to \fBTEST_CASE.action\fR,
+/*	enabling function reuse across multiple test cases.
 /*
 /*	.BR run_tests ()
 /*	executes the given list of test cases and returns:
@@ -45,7 +49,8 @@
 /*	execution of the remaining test cases, but a test case that
 /*	returns \fBFAIL_STOP\fR or \fBERROR\fR does.
 /*	The final test case to run must be followed by a zero
-/*	\fBTEST_CASE\fR (\fB.label\fR and \fB.action\fR are null).
+/*	\fBTEST_CASE\fR (\fB.label\fR, \fB.action\fR, and \fB.arg\fR
+/*	are null).
 /*	The start and end of each test case is logged, and a summary
 /*	of the results is logged at the end.
 /* LICENSE
@@ -85,7 +90,7 @@ TEST_RESULT run_tests(const TEST_CASE *test_cases)
 
     for (tp = test_cases; tp->label; tp++) {
 	msg_info("RUN  %s", tp->label);
-	TEST_RESULT result = tp->action();
+	TEST_RESULT result = tp->action(tp->arg);
 	if (result == PASS) {
 	    msg_info("PASS %s", tp->label);
 	    tests_passed += 1;
