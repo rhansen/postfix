@@ -32,7 +32,7 @@
 
 static VSTRING *msg_buf;
 
-static TEST_RESULT valid_refcounts_for_good_composite_syntax(void)
+static TEST_RESULT valid_refcounts_for_good_composite_syntax(void *unused)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
@@ -81,7 +81,7 @@ static TEST_RESULT valid_refcounts_for_good_composite_syntax(void)
     RETURN(PASS);
 }
 
-static TEST_RESULT valid_refcounts_for_bad_composite_syntax(void)
+static TEST_RESULT valid_refcounts_for_bad_composite_syntax(void *unused)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
@@ -129,7 +129,7 @@ static TEST_RESULT valid_refcounts_for_bad_composite_syntax(void)
     RETURN(PASS);
 }
 
-static TEST_RESULT propagates_notfound_and_found(void)
+static TEST_RESULT propagates_notfound_and_found(void *unused)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
@@ -155,7 +155,7 @@ static TEST_RESULT propagates_notfound_and_found(void)
     return (ret);
 }
 
-static TEST_RESULT propagates_error(void)
+static TEST_RESULT propagates_error(void *unused)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
@@ -179,7 +179,7 @@ static TEST_RESULT propagates_error(void)
     return (ret);
 }
 
-static TEST_RESULT no_comma_for_not_found(void)
+static TEST_RESULT no_comma_for_not_found(void *unused)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
