@@ -32,7 +32,7 @@
 
 static VSTRING *msg_buf;
 
-static int valid_refcounts_for_good_composite_syntax(void)
+static TEST_RESULT valid_refcounts_for_good_composite_syntax(void)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
@@ -81,7 +81,7 @@ static int valid_refcounts_for_good_composite_syntax(void)
     RETURN(PASS);
 }
 
-static int valid_refcounts_for_bad_composite_syntax(void)
+static TEST_RESULT valid_refcounts_for_bad_composite_syntax(void)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
@@ -129,7 +129,7 @@ static int valid_refcounts_for_bad_composite_syntax(void)
     RETURN(PASS);
 }
 
-static int propagates_notfound_and_found(void)
+static TEST_RESULT propagates_notfound_and_found(void)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
@@ -141,7 +141,7 @@ static int propagates_notfound_and_found(void)
 	{.key = "k2",.want_value = "v3"},
 	{0},
     };
-    int     ret;
+    TEST_RESULT ret;
 
     dict = dict_open_and_capture_msg(dict_spec, open_flags, dict_flags,
 				     msg_buf);
@@ -155,7 +155,7 @@ static int propagates_notfound_and_found(void)
     return (ret);
 }
 
-static int propagates_notfound_and_error(void)
+static TEST_RESULT propagates_notfound_and_error(void)
 {
     DICT   *dict;
     int     open_flags = O_RDONLY;
@@ -166,7 +166,7 @@ static int propagates_notfound_and_error(void)
 	{.key = "k1",.want_value = 0,.want_error = DICT_ERR_RETRY},
 	{0},
     };
-    int     ret;
+    TEST_RESULT ret;
 
     dict = dict_open_and_capture_msg(dict_spec, open_flags, dict_flags,
 				     msg_buf);
@@ -190,7 +190,7 @@ static const TEST_CASE test_cases[] = {
 
 int     main(int argc, char **argv)
 {
-    int result;
+    TEST_RESULT result;
 
     msg_vstream_init(sane_basename((VSTRING *) 0, argv[0]), VSTREAM_ERR);
 
