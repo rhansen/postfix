@@ -17,7 +17,8 @@
 /*	typedef struct TEST_CASE {
 /* .in +4
 /*	const char *label;
-/*	TEST_RESULT (*action) (void);
+/*	TEST_RESULT (*action) (void *arg);
+/*	void	*arg;
 /* .in -4
 /*	} TEST_CASE;
 /*
@@ -25,7 +26,9 @@
 /*	const TEST_CASE *test_cases)
 /* DESCRIPTION
 /*	TEST_CASE.label is a name that is logged when the test case
-/*	runs.
+/*	runs.  TEST_CASE.arg is optional; it is passed to
+/*	TEST_CASE.action, enabling function reuse across multiple test
+/*	cases.
 /*
 /*	run_tests() executes the given list of test cases and returns
 /*	PASS if none failed (including if there are no test cases).  A
@@ -71,7 +74,7 @@ TEST_RESULT run_tests(const TEST_CASE *test_cases)
 
     for (tp = test_cases; tp->label; tp++) {
 	msg_info("RUN  %s", tp->label);
-	TEST_RESULT result = tp->action();
+	TEST_RESULT result = tp->action(tp->arg);
 	if (result == PASS) {
 	    msg_info("PASS %s", tp->label);
 	    tests_passed += 1;

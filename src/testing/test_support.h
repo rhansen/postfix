@@ -22,7 +22,8 @@ typedef enum {
 
 typedef struct TEST_CASE {
     const char *label;
-    TEST_RESULT (*action) (void);
+    TEST_RESULT (*action) (void *arg);
+    void   *arg;
 } TEST_CASE;
 
 extern TEST_RESULT run_tests(const TEST_CASE *test_cases);
