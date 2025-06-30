@@ -34,14 +34,14 @@
 /* .in -4
 /*	}
 /*
-/*	int dict_get_and_verify(
+/*	TEST_RESULT dict_get_and_verify(
 /*	DICT	*dict,
 /*	const char *key,
 /*	const char *want_value,
 /*	int	want_error,
 /*	const char *want_msg)
 /*
-/*	int	dict_get_and_verify_bulk(
+/*	TEST_RESULT dict_get_and_verify_bulk(
 /*	DICT	*dict,
 /*	const struct dict_get_verify_data *data)
 /* DESCRIPTION
@@ -208,11 +208,11 @@ const char *dict_get_and_capture_msg(DICT *dict, const char *key,
 
 /* dict_get_and_verify - deploy dict_get() and verify results */
 
-int     dict_get_and_verify(DICT *dict, const char *key, const char *want_value,
+TEST_RESULT dict_get_and_verify(DICT *dict, const char *key, const char *want_value,
 			            int want_error, const char *want_msg)
 {
     VSTRING *msg_buf = vstring_alloc(100);
-    int     ret = PASS;
+    TEST_RESULT ret = PASS;
     const char *got;
 
     got = dict_get_and_capture_msg(dict, key, msg_buf);
@@ -250,10 +250,10 @@ int     dict_get_and_verify(DICT *dict, const char *key, const char *want_value,
 
 /* dict_get_and_verify_bulk - dict_get_and_verify() wrapper for bulk usage */
 
-int     dict_get_and_verify_bulk(DICT *dict,
+TEST_RESULT dict_get_and_verify_bulk(DICT *dict,
 			           const struct dict_get_verify_data * data)
 {
-    int     ret = PASS;
+    TEST_RESULT ret = PASS;
     const struct dict_get_verify_data *dp;
 
     for (dp = data; dp->key; dp++) {

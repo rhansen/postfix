@@ -19,6 +19,11 @@
 #include <vstring.h>
 
  /*
+  * Testing library.
+  */
+#include <test_support.h>
+
+ /*
   * External interface.
   */
 extern DICT *dict_open_and_capture_msg(const char *, int, int, VSTRING *);
@@ -32,8 +37,8 @@ struct dict_get_verify_data {
     const char *want_msg;
 };
 
-extern int dict_get_and_verify(DICT *, const char *, const char *, int, const char *);
-extern int dict_get_and_verify_bulk(DICT *, const struct dict_get_verify_data *);
+extern TEST_RESULT dict_get_and_verify(DICT *, const char *, const char *, int, const char *);
+extern TEST_RESULT dict_get_and_verify_bulk(DICT *, const struct dict_get_verify_data *);
 
 /* LICENSE
 /*	The Secure Mailer license must be distributed with this software.
