@@ -200,8 +200,8 @@ static const struct TEST_CASE test_cases[] = {
 
 int     main(int argc, char **argv)
 {
-    static int tests_passed = 0;
-    static int tests_failed = 0;
+    int tests_passed = 0;
+    int tests_failed = 0;
     const struct TEST_CASE *tp;
 
     msg_vstream_init(sane_basename((VSTRING *) 0, argv[0]), VSTREAM_ERR);
