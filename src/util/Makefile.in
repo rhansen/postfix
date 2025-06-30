@@ -1749,6 +1749,7 @@ dict_pipe.o: vbuf.h
 dict_pipe.o: vstream.h
 dict_pipe.o: vstring.h
 dict_pipe_test.o: ../../include/dict_test_helper.h
+dict_pipe_test.o: ../../include/test_support.h
 dict_pipe_test.o: argv.h
 dict_pipe_test.o: check_arg.h
 dict_pipe_test.o: dict.h
@@ -1930,6 +1931,7 @@ dict_union.o: vbuf.h
 dict_union.o: vstream.h
 dict_union.o: vstring.h
 dict_union_test.o: ../../include/dict_test_helper.h
+dict_union_test.o: ../../include/test_support.h
 dict_union_test.o: argv.h
 dict_union_test.o: check_arg.h
 dict_union_test.o: dict.h
