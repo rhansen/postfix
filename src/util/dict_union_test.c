@@ -25,15 +25,10 @@
   * Testing library.
   */
 #include <dict_test_helper.h>
+#include <test_support.h>
 
 #define LEN(x)	VSTRING_LEN(x)
 #define STR(x)	vstring_str(x)
-
- /*
-  * TODO(wietse) move these to common testing header file.
-  */
-#define PASS	1
-#define FAIL	0
 
 static VSTRING *msg_buf;
 
@@ -211,11 +206,6 @@ static int no_comma_for_not_found(void)
     return (ret);
 }
 
-struct TEST_CASE {
-    const char *label;
-    int     (*action) (void);
-};
-
 static const struct TEST_CASE test_cases[] = {
     {"valid_refcounts_for_good_composite_syntax", valid_refcounts_for_good_composite_syntax,},
     {"valid_refcounts_for_bad_composite_syntax", valid_refcounts_for_bad_composite_syntax,},
@@ -227,27 +217,14 @@ static const struct TEST_CASE test_cases[] = {
 
 int     main(int argc, char **argv)
 {
-    int tests_passed = 0;
-    int tests_failed = 0;
-    const struct TEST_CASE *tp;
+    int result;
 
     msg_vstream_init(sane_basename((VSTRING *) 0, argv[0]), VSTREAM_ERR);
 
     msg_buf = vstring_alloc(100);
     dict_allow_surrogate = 1;
-
-    for (tp = test_cases; tp->label; tp++) {
-	msg_info("RUN  %s", tp->label);
-	if (tp->action() == PASS) {
-	    msg_info("PASS %s", tp->label);
-	    tests_passed += 1;
-	} else {
-	    msg_info("FAIL %s", tp->label);
-	    tests_failed += 1;
-	}
-    }
+    result = run_tests(test_cases);
     vstring_free(msg_buf);
 
-    msg_info("PASS=%d FAIL=%d", tests_passed, tests_failed);
-    exit(tests_failed != 0);
+    exit(result != PASS);
 }

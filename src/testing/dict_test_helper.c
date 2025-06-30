@@ -99,14 +99,13 @@
 #include <vstream.h>
 #include <vstring.h>
 
+ /*
+  * Testing library.
+  */
+#include <test_support.h>
+
 #define LEN(x)	VSTRING_LEN(x)
 #define STR(x)	vstring_str(x)
-
- /*
-  * TODO(wietse) factor this out to common testing header file.
-  */
-#define PASS	1
-#define FAIL	0
 
  /*
   * TODO(wietse) make this a proper VSTREAM interface or test helper API.
