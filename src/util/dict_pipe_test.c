@@ -180,7 +180,7 @@ static int propagates_notfound_and_error(void)
     return (ret);
 }
 
-static const struct TEST_CASE test_cases[] = {
+static const TEST_CASE test_cases[] = {
     {"valid_refcounts_for_good_composite_syntax", valid_refcounts_for_good_composite_syntax,},
     {"valid_refcounts_for_bad_composite_syntax", valid_refcounts_for_bad_composite_syntax,},
     {"propagates_notfound_and_found", propagates_notfound_and_found,},

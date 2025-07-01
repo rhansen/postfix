@@ -17,12 +17,12 @@
 #define PASS	1
 #define FAIL	0
 
-struct TEST_CASE {
+typedef struct TEST_CASE {
     const char *label;
     int     (*action) (void);
-};
+} TEST_CASE;
 
-extern int run_tests(const struct TEST_CASE *test_cases);
+extern int run_tests(const TEST_CASE *test_cases);
 
 /* LICENSE
 /*	The Secure Mailer license must be distributed with this software.
