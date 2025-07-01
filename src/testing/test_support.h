@@ -15,8 +15,9 @@
   * External interface.
   */
 typedef enum {
+    PASS = 0,
     FAIL,
-    PASS,
+    ERROR,
 } TEST_RESULT;
 
 typedef struct TEST_CASE {
