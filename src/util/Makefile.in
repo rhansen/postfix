@@ -155,7 +155,7 @@ TESTPROG= dict_open dup2_pass_on_exec events exec_command fifo_open \
 	clean_env inet_prefix_top printable readlline quote_for_json \
 	normalize_ws valid_uri_scheme clean_ascii_cntrl_space \
 	normalize_v4mapped_addr_test ossl_digest_test dict_pipe_test \
-	dict_union_test
+	dict_register_test dict_union_test
 PLUGIN_MAP_SO = $(LIB_PREFIX)pcre$(LIB_SUFFIX) $(LIB_PREFIX)lmdb$(LIB_SUFFIX) \
 	$(LIB_PREFIX)cdb$(LIB_SUFFIX) $(LIB_PREFIX)sdbm$(LIB_SUFFIX)
 HTABLE_FIX = NORANDOMIZE=1
@@ -644,6 +644,9 @@ ossl_digest_test: ossl_digest_test.c $(LIB)
 dict_pipe_test: dict_pipe_test.c $(TESTLIB) $(LIB)
 	$(CC) $(CFLAGS) -o $@ $@.c $(TESTLIB) $(LIB) $(SYSLIBS)
 
+dict_register_test: dict_register_test.c $(TESTLIB) $(LIB)
+	$(CC) $(CFLAGS) -o $@ $@.c $(TESTLIB) $(LIB) $(SYSLIBS)
+
 dict_union_test: dict_union_test.c $(TESTLIB) $(LIB)
 	$(CC) $(CFLAGS) -o $@ $@.c $(TESTLIB) $(LIB) $(SYSLIBS)
 
@@ -660,7 +663,7 @@ tests: all valid_hostname_test mac_expand_test dict_test unescape_test \
 	valid_utf8_string_test readlline_test quote_for_json_test \
 	normalize_ws_test valid_uri_scheme_test clean_ascii_cntrl_space_test \
 	test_normalize_v4mapped_addr test_ossl_digest test_dict_pipe \
-	test_dict_union
+	test_dict_register test_dict_union
  
 dict_tests: all dict_test \
 	dict_pcre_tests dict_cidr_test dict_thash_test dict_static_test \
@@ -1149,6 +1152,9 @@ test_ossl_digest: update ossl_digest_test
 
 test_dict_pipe: update dict_pipe_test
 	$(SHLIB_ENV) ${VALGRIND} ./dict_pipe_test
+
+test_dict_register: update dict_register_test
+	$(SHLIB_ENV) ${VALGRIND} ./dict_register_test
 
 test_dict_union: update dict_union_test
 	$(SHLIB_ENV) ${VALGRIND} ./dict_union_test
@@ -1794,6 +1800,18 @@ dict_regexp.o: vbuf.h
 dict_regexp.o: vstream.h
 dict_regexp.o: vstring.h
 dict_regexp.o: warn_stat.h
+dict_register_test.o: argv.h
+dict_register_test.o: check_arg.h
+dict_register_test.o: dict.h
+dict_register_test.o: dict_register_test.c
+dict_register_test.o: msg.h
+dict_register_test.o: msg_vstream.h
+dict_register_test.o: myflock.h
+dict_register_test.o: stringops.h
+dict_register_test.o: sys_defs.h
+dict_register_test.o: vbuf.h
+dict_register_test.o: vstream.h
+dict_register_test.o: vstring.h
 dict_sdbm.o: argv.h
 dict_sdbm.o: check_arg.h
 dict_sdbm.o: dict.h

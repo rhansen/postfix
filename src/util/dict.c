@@ -269,6 +269,7 @@
 /* System libraries. */
 
 #include "sys_defs.h"
+#include <assert.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <ctype.h>
@@ -335,7 +336,13 @@ typedef struct {
 
 static void dict_register_close(DICT *dict)
 {
-    /* This will eventually call dict->saved_lose(). */
+    /*
+     * This function does not restore dict->saved_close to dict->close because
+     * dict_open() can return the same table object multiple times, and each
+     * call to dict_open() is expected to be paired with its own eventual call
+     * to dict_close().  Instead, dict_unregister() will call dict->saved_close
+     * once the ref count drops to 0.
+     */
     dict_unregister(dict->reg_name);
 }
 
@@ -346,14 +353,6 @@ void    dict_register(const char *dict_name, DICT *dict_info)
     const char *myname = "dict_register";
     DICT_NODE *node;
 
-    /*
-     * Enforce referential integrity.
-     */
-    if (dict_info->reg_name && strcmp(dict_name, dict_info->reg_name) != 0)
-	msg_panic("%s: '%s:%s' is already registered under '%s' and cannot "
-		  "also be registered under '%s'", myname, dict_info->type,
-		  dict_info->name, dict_info->reg_name, dict_name);
-
     if (dict_table == 0)
 	dict_table = htable_create(0);
     if ((node = dict_node(dict_name)) == 0) {
@@ -361,9 +360,36 @@ void    dict_register(const char *dict_name, DICT *dict_info)
 	node->dict = dict_info;
 	node->refcount = 0;
 	htable_enter(dict_table, dict_name, (void *) node);
-	dict_info->reg_name = mystrdup(dict_name);
-	dict_info->saved_close = dict_info->close;
-	dict_info->close = dict_register_close;
+	if (dict_info->reg_name == 0) {
+	    assert(dict_info->saved_close == 0);
+	    dict_info->reg_name = mystrdup(dict_name);
+	    dict_info->saved_close = dict_info->close;
+	    dict_info->close = dict_register_close;
+	} else {
+	    /*
+	     * The table has been registered before under a different name --
+	     * dict_name is a new alias.  This only happens if this function
+	     * was called directly -- not called via dict_open() -- on an
+	     * already-open table.  The caller is expected to eventually call
+	     * dict_unregister() -- not dict_close() -- to release its
+	     * reference.
+	     *
+	     * The caller must remember the new alias so that it can be passed
+	     * to dict_unregister().  Thus, this function is not obligated to
+	     * save it somewhere.
+	     */
+	    assert(strcmp(dict_name, dict_info->reg_name) != 0);
+	    /*
+	     * Increment the refcount on the original node (the hash table node
+	     * associated with the original name) to prevent the table from
+	     * being closed via unregistrations of other names/aliases.  The new
+	     * node created above owns the refcount increment added in this
+	     * recursive call.  Once the new node's refcount drops to zero,
+	     * dict_unregister() will remove the increment added to the original
+	     * node.
+	     */
+	    dict_register(dict_info->reg_name, dict_info);
+	}
     } else if (dict_info != node->dict)
 	msg_fatal("%s: dictionary name exists: %s", myname, dict_name);
     node->refcount++;
@@ -400,13 +426,27 @@ void    dict_unregister(const char *dict_name)
 {
     const char *myname = "dict_unregister";
     DICT_NODE *node;
+    DICT   *dict;
 
     if ((node = dict_node(dict_name)) == 0)
 	msg_panic("non-existing dictionary: %s", dict_name);
+    dict = node->dict;
     if (msg_verbose > 1)
 	msg_info("%s: %s %d", myname, dict_name, node->refcount);
-    if (--(node->refcount) == 0)
-	htable_delete(dict_table, dict_name, dict_node_free);
+    if (--(node->refcount) == 0) {
+	if (strcmp(dict->reg_name, dict_name) == 0) {
+	    htable_delete(dict_table, dict_name, dict_node_free);
+	} else {
+	    /*
+	     * dict_name is an alias of dict->reg_name.  Delete the hash table
+	     * node for the alias, but do not close the table; instead,
+	     * decrement the original name's refcount (which was incremented
+	     * when the alias was first created).
+	     */
+	    htable_delete(dict_table, dict_name, myfree);
+	    dict_unregister(dict->reg_name);
+	}
+    }
 }
 
 /* dict_update - replace or add dictionary entry */
