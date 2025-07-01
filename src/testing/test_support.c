@@ -9,15 +9,15 @@
 /*	#define PASS	1
 /*	#define FAIL	0
 /*
-/*	struct TEST_CASE {
+/*	typedef struct TEST_CASE {
 /* .in +4
 /*	const char *label;
 /*	int	(*action) (void);
 /* .in -4
-/*	};
+/*	} TEST_CASE;
 /*
 /*	int	run_tests(
-/*	const struct TEST_CASE *test_cases)
+/*	const TEST_CASE *test_cases)
 /* DESCRIPTION
 /*	.B TEST_CASE.label
 /*	is a name that is logged when the test case runs.
@@ -68,11 +68,11 @@
 
 /* run_tests - execute a zero-terminated suite of test cases */
 
-int     run_tests(const struct TEST_CASE *test_cases)
+int     run_tests(const TEST_CASE *test_cases)
 {
     int tests_passed = 0;
     int tests_failed = 0;
-    const struct TEST_CASE *tp;
+    const TEST_CASE *tp;
 
     for (tp = test_cases; tp->label; tp++) {
 	msg_info("RUN  %s", tp->label);
