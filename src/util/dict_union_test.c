@@ -226,5 +226,5 @@ int     main(int argc, char **argv)
     result = run_tests(test_cases);
     vstring_free(msg_buf);
 
-    exit(result != PASS);
+    exit(result);
 }
