@@ -1066,7 +1066,7 @@ vbuf_print_test: vbuf_print vbuf_print_test.in vbuf_print_test.ref
 	diff vbuf_print_test.ref vbuf_print_test.tmp
 	rm -f vbuf_print_test.tmp
 
-vstring_test: dict_open vstring vstring_test.ref
+vstring_test: vstring vstring_test.ref
 	$(SHLIB_ENV) ${VALGRIND} ./vstring one two three >vstring_test.tmp 2>&1
 	diff vstring_test.ref vstring_test.tmp
 	rm -f vstring_test.tmp
