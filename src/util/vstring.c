@@ -126,15 +126,44 @@
 /* DESCRIPTION
 /*	The functions and macros in this module implement arbitrary-length
 /*	strings and common operations on those strings. The strings do not
-/*	need to be null terminated and may contain arbitrary binary data.
+/*	need to be null terminated and may contain arbitrary binary
+/*	data, including null bytes.
 /*	Operations that expect a null-terminated string as input will
 /*	process only the input that precedes the first null byte.
 /*	The strings manage their own memory and grow automatically when full.
-/*	The optional string null terminator does not add to the string length.
+/*
+/*	Many of the functions and macros in this module write a null
+/*	terminator.
+/*	Room for a terminator is always reserved outside of the
+/*	reported capacity (VSTRING_LEN() plus vstring_avail()).
+/*	Any null terminator written by this module is not counted in
+/*	VSTRING_LEN() and does not consume any of the VSTRING's
+/*	available capacity.
+/*	Thus, a VSTRING with capacity \fIN\fR can hold:
+/* .IP \(bu
+/*	a null-terminated string with length less than or equal to
+/*	\fIN\fR (up to \fIN\fR+1 bytes total, including the
+/*	terminator), or
+/* .IP \(bu
+/*	an unterminated string with length less than or equal to
+/*	\fIN\fR.
+/* .PP
+/*	Unlike a null terminator written by this module, a zero byte
+/*	explicitly added to a string (such as by calling
+/*	\fBVSTRING_ADDCH(buf, 0)\fR) does consume capacity (it
+/*	increases the string length).
 /*
 /*	vstring_alloc() allocates storage for a variable-length string
-/*	of at least "len" bytes. The minimal length is 1. The result
-/*	is a null-terminated string of length zero.
+/*	with capacity at least \fIlen\fR bytes.
+/*	The null terminator written by this module's functions and
+/*	macros does not consume any capacity, so \fIlen\fR does not
+/*	need to include room for a null terminator.
+/*	The minimal length is 1.
+/*	The result is a string of length zero with at least \fIlen\fR
+/*	bytes available (see vstring_avail()).
+/*	The first byte of the allocated storage is initialized to 0,
+/*	so it is immediately usable as a zero-length
+/*	null-terminated C string.
 /*
 /*	vstring_ctl() gives additional control over VSTRING behavior.
 /*	The function takes a VSTRING pointer and a list of zero or
@@ -158,6 +187,7 @@
 /*
 /*	vstring_avail() returns the number of bytes that can be placed
 /*	into the buffer before the buffer would need to grow.
+/*	vstring_avail() plus VSTRING_LEN() is the VSTRING's capacity.
 /*
 /*	vstring_free() reclaims storage for a variable-length string.
 /*	It conveniently returns a null pointer.
@@ -170,6 +200,7 @@
 /*	its argument (i.e. the distance from the start of the string
 /*	to the current write position). VSTRING_LEN() is an unsafe macro
 /*	that evaluates its argument more than once.
+/*	VSTRING_LEN() plus vstring_avail() is the VSTRING's capacity.
 /*
 /*	vstring_end() is a macro that returns the current write position of
 /*	its argument. It is a safe macro that evaluates its argument only once.
@@ -204,6 +235,14 @@
 /*	VSTRING_TERMINATE() is an unsafe macro that evaluates some
 /*	arguments more than once.
 /*	VSTRING_TERMINATE() does not return an interesting result.
+/*	The length of the string (see VSTRING_LEN()) and the remaining
+/*	available capacity (see vstring_avail()) are unchanged.
+/*	Memory for the string is guaranteed to not be reallocated by
+/*	this macro (a pointer returned from a prior call to
+/*	vstring_str() or vstring_end() is not invalidated).
+/*	The available capacity may be zero before invoking this macro;
+/*	room for the terminator is always reserved outside of the
+/*	reported capacity.
 /*
 /*	VSTRING_SKIP() is a macro that moves the write position to the first
 /*	null byte after the current write position. VSTRING_SKIP() is an unsafe
