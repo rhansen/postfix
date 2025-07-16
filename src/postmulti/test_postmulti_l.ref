@@ -1,22 +1,38 @@
 >>> 1: single instance (multi_instance_enable = no)
 LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
 -               -               y         <testtmp>/etc/postfix
+LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
+{"name":null,"group":null,"enabled":true,"config_directory":"<testtmp>/etc/postfix"}
 >>> 2: single instance (multi_instance_enable = yes)
 LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
 -               -               y         <testtmp>/etc/postfix
+LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
+{"name":null,"group":null,"enabled":true,"config_directory":"<testtmp>/etc/postfix"}
 >>> 3: multiple instances, secondary name=false group=false
 LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
 -               -               y         <testtmp>/etc/postfix
 -               -               n         <testtmp>/etc/postfix-secondary
+LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
+{"name":null,"group":null,"enabled":true,"config_directory":"<testtmp>/etc/postfix"}
+{"name":null,"group":null,"enabled":false,"config_directory":"<testtmp>/etc/postfix-secondary"}
 >>> 4: multiple instances, secondary name=true group=false
 LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
 -               -               y         <testtmp>/etc/postfix
 postfix-secondary -               n         <testtmp>/etc/postfix-secondary
+LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
+{"name":null,"group":null,"enabled":true,"config_directory":"<testtmp>/etc/postfix"}
+{"name":"postfix-secondary","group":null,"enabled":false,"config_directory":"<testtmp>/etc/postfix-secondary"}
 >>> 5: multiple instances, secondary name=true group=true
 LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
 -               -               y         <testtmp>/etc/postfix
 postfix-secondary secondary       n         <testtmp>/etc/postfix-secondary
+LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
+{"name":null,"group":null,"enabled":true,"config_directory":"<testtmp>/etc/postfix"}
+{"name":"postfix-secondary","group":"secondary","enabled":false,"config_directory":"<testtmp>/etc/postfix-secondary"}
 >>> 6: multiple instances, secondary name=false group=true
 LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
 -               -               y         <testtmp>/etc/postfix
 -               secondary       n         <testtmp>/etc/postfix-secondary
+LOG: warning: The primary instance's configuration directory is set to a value (<testtmp>/etc/postfix) that differs from the default (/etc/postfix).  Support for this is experimental; see the documentation for the postmulti(1) '-c' option.
+{"name":null,"group":null,"enabled":true,"config_directory":"<testtmp>/etc/postfix"}
+{"name":null,"group":"secondary","enabled":false,"config_directory":"<testtmp>/etc/postfix-secondary"}

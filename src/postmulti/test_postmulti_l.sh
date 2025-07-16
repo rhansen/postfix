@@ -34,6 +34,7 @@ secondary_cf=${testtmp}/etc/postfix-secondary/main.cf
 
 echo ">>> 1: single instance (multi_instance_enable = no)"
 postmulti -l
+postmulti -l -j
 
 echo ">>> 2: single instance (multi_instance_enable = yes)"
 cat <<EOF >>${primary_cf}
@@ -41,26 +42,31 @@ multi_instance_wrapper = ${command_directory}/postmulti -p --
 multi_instance_enable = yes
 EOF
 postmulti -l
+postmulti -l -j
 
 echo ">>> 3: multiple instances, secondary name=false group=false"
 cat <<EOF >>${primary_cf}
 multi_instance_directories = ${testtmp}/etc/postfix-secondary
 EOF
 postmulti -l
+postmulti -l -j
 
 echo ">>> 4: multiple instances, secondary name=true group=false"
 cat <<EOF >>${secondary_cf}
 multi_instance_name = postfix-secondary
 EOF
 postmulti -l
+postmulti -l -j
 
 echo ">>> 5: multiple instances, secondary name=true group=true"
 cat <<EOF >>${secondary_cf}
 multi_instance_group = secondary
 EOF
 postmulti -l
+postmulti -l -j
 
 echo ">>> 6: multiple instances, secondary name=false group=true"
 sed -e '/multi_instance_name/d' "${secondary_cf}" >${secondary_cf}.new
 mv "${secondary_cf}".new "${secondary_cf}"
 postmulti -l
+postmulti -l -j
