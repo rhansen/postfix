@@ -6,7 +6,7 @@
 /* SYNOPSIS
 /* .SS "Iterator modes"
 /*
-/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-l\fR [\fB-aRv\fR]
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-l\fR [\fB-ajRv\fR]
 /*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR]
 /*
 /*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-p\fR [\fB-av\fR]
@@ -126,6 +126,32 @@
 /* .IP \fB-l\fR
 /*	List Postfix instances with their instance name, instance
 /*	group name, enable/disable status and configuration directory.
+/* .IP \fB-j\fR
+/*	Output the list of instances as a newline-delimited stream of
+/*	JSON objects instead of the usual format.
+/*	Only valid with \fB-l\fR.
+/*	Each object has the following keys:
+/* .RS
+/* .IP \fBname\fR
+/*	String containing the instance's name (see the
+/*	\fBmulti_instance_name\fR configuration parameter), or null if
+/*	unnamed.
+/* .IP \fBgroup\fR
+/*	String containing the instance's group name (see the
+/*	\fBmulti_instance_group\fR configuration parameter), or null
+/*	if the instance does not have a group name.
+/* .IP \fBenabled\fR
+/*	Boolean indicating whether the instance is enabled.
+/* .IP \fBconfig_directory\fR
+/*	String containing the pathname of the instance's configuration
+/*	directory.
+/* .RE
+/* .IP
+/*	If the name, group name, or configuration directory of any
+/*	instance is not a valid UTF-8 string, an error is returned
+/*	instead of any JSON output.
+/*
+/*	This feature is available in Postfix 3.11 and later.
 /* .SS "Postfix-wrapper mode"
 /* .IP "\fB-p \fIpostfix-command\fR"
 /*	Invoke \fBpostfix\fR(1) to execute \fIpostfix-command\fR.
@@ -623,6 +649,7 @@ typedef struct {
 #define ITER_FLAG_REVERSE	(1<<0)	/* reverse iteration order */
 #define ITER_FLAG_CHECK_DISABLED (1<<1)	/* check disabled instances */
 #define ITER_FLAG_SKIP_DISABLED	(1<<2)	/* skip disabled instances */
+#define ITER_FLAG_OUTPUT_JSON	(1<<3)	/* print output in JSON */
 
  /*
   * Environment export controls for edit commands. postmulti(1) exports only
@@ -1560,12 +1587,71 @@ static void list_instances(int iter_flags, INST_SELECTION *selection)
     RING   *entry;
     INSTANCE *ip;
 
+    if (iter_flags & ITER_FLAG_OUTPUT_JSON) {
+	/* Sanity check before writing any JSON output (all or nothing). */
+	FOREACH_ITERATOR_INSTANCE(iter_flags, entry) {
+	    ip = RING_TO_INSTANCE(entry);
+	    if (!match_instance_selection(ip, selection))
+		continue;
+	    if (ip->name && !valid_utf8_stringz(ip->name))
+		msg_fatal("unable to output JSON: "
+			  "instance name is not valid UTF-8: %s", ip->name);
+	    if (ip->gname && !valid_utf8_stringz(ip->gname))
+		msg_fatal("unable to output JSON: "
+			  "instance group name is not valid UTF-8: %s",
+			  ip->gname);
+	    /*
+	     * Note: POSIX Issue 8 defines a pathname as a sequence of non-null
+	     * bytes, NOT a string of characters.  Thus, a valid pathname might
+	     * be an invalid UTF-8 string, and a valid UTF-8 string might be an
+	     * invalid pathname (if it has an embedded U+0000 null byte, which
+	     * can't happen here because the pathname is null-terminated).
+	     *
+	     * JSON strings are UTF-8 (with escapes).  JSON does not have a byte
+	     * string type.  To perfectly represent any possible pathname, this
+	     * function would need to encode it in a way that can be represented
+	     * in JSON (exmples: a base64 string, an array of byte value
+	     * numbers, a string where non-UTF-8 bytes are replaced with escaped
+	     * Unicode characters).  Users would then need to decode the value
+	     * to get the original byte string.  That is too obnoxious,
+	     * especially given how rare non-UTF-8 pathnames are expected to be.
+	     * Instead, this function simply refuses to output anything if a
+	     * non-UTF-8 pathname is encountered.
+	     *
+	     * If a user requests non-UTF-8 support, this function can be
+	     * changed to output a property such as "config_directory_base64" in
+	     * addition to the "config_directory" property (which would be
+	     * omitted if non-UTF-8).
+	     */
+	    if (!valid_utf8_stringz(ip->config_dir))
+		msg_fatal("unable to output JSON: "
+			  "config directory is not valid UTF-8: %s",
+			  ip->config_dir);
+	}
+    }
+
     /*
      * Iterate over the selected instances.
      */
     FOREACH_ITERATOR_INSTANCE(iter_flags, entry) {
 	ip = RING_TO_INSTANCE(entry);
-	if (match_instance_selection(ip, selection))
+	if (!match_instance_selection(ip, selection))
+	    continue;
+	if (iter_flags & ITER_FLAG_OUTPUT_JSON) {
+	    VSTRING *buf = vstring_alloc(100);
+	    vstream_printf("{\"name\":%s%s%s,",
+			   ip->name ? "\"" : "",
+			   ip->name ? quote_for_json(buf, ip->name, -1) : "null",
+			   ip->name ? "\"" : "");
+	    vstream_printf("\"group\":%s%s%s,",
+			   ip->gname ? "\"" : "",
+			   ip->gname ? quote_for_json(buf, ip->gname, -1) : "null",
+			   ip->gname ? "\"" : "");
+	    vstream_printf("\"enabled\":%s,", ip->enabled ? "true" : "false");
+	    vstream_printf("\"config_directory\":\"%s\"}\n",
+			   quote_for_json(buf, ip->config_dir, -1));
+	    vstring_free(buf);
+	} else
 	    vstream_printf("%-15s %-15s %-9s %s\n",
 			   ip->name ? ip->name : "-",
 			   ip->gname ? ip->gname : "-",
@@ -1649,7 +1735,7 @@ static NORETURN usage(const char *progname)
 {
 #define COMMON "    %s [-c dir] [-v] "
     msg_error("Usage:");
-    msg_error(COMMON "-l [-a] [-g group] [-i name] |", progname);
+    msg_error(COMMON "-l [-a] [-g group] [-i name] [-j] |", progname);
     msg_error(COMMON "-p [-a] [-g group] [-i name] command ... |", progname);
     msg_error(COMMON "-x [-a] [-g group] [-i name] command ... |", progname);
     msg_error(COMMON "-e %s |", progname, EDIT_CMD_STR(EDIT_CMD_INIT));
@@ -1765,7 +1851,7 @@ int     main(int argc, char **argv)
      * Parse switches. Move the above mail_conf_read() block after this loop,
      * if any command-line option can affect parameter processing.
      */
-    while ((ch = GETOPT(argc, argv, "ac:e:g:i:G:I:lpRvx")) > 0) {
+    while ((ch = GETOPT(argc, argv, "ac:e:g:i:G:I:jlpRvx")) > 0) {
 	switch (ch) {
 	default:
 	    usage(argv[0]);
@@ -1815,6 +1901,9 @@ int     main(int argc, char **argv)
 		msg_fatal("Specify at most one '-I' option");
 	    assignment.name = strcmp(optarg, "-") == 0 ? "" : optarg;
 	    break;
+	case 'j':
+	    iter_flags |= ITER_FLAG_OUTPUT_JSON;
+	    break;
 	case 'l':
 	    if (cmd_mode != ITER_CMD_LIST)
 		command_mode_count++;
@@ -1851,6 +1940,9 @@ int     main(int argc, char **argv)
 
     if (cmd_mode == ITER_CMD_LIST && argc > optind)
 	msg_fatal("Command not allowed with '-l'");
+
+    if (cmd_mode != ITER_CMD_LIST && iter_flags & ITER_FLAG_OUTPUT_JSON)
+	msg_fatal("The '-j' option is only valid with the '-l' option");
 
     if (cmd_mode == ITER_CMD_POSTFIX || cmd_mode == ITER_CMD_GENERIC)
 	if (argc == optind)
