@@ -6,37 +6,41 @@
 /* SYNOPSIS
 /* .SS "Iterator modes"
 /*
-/*	\fBpostmulti\fR \fB-l\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
-/*	[\fB-i \fIname\fR]
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-l\fR [\fB-aRv\fR]
+/*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR]
 /*
-/*	\fBpostmulti\fR \fB-p\fR [\fB-av\fR] [\fB-g \fIgroup\fR]
-/*	[\fB-i \fIname\fR] \fIpostfix-command\fR ...
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-p\fR [\fB-av\fR]
+/*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] \fIpostfix-command\fR ...
 /*
-/*	\fBpostmulti\fR \fB-x\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
-/*	[\fB-i \fIname\fR] \fIunix-command\fR ...
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-x\fR [\fB-aRv\fR]
+/*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] \fIunix-command\fR ...
 /*
 /* .SS "Life-cycle management modes"
 /*
-/*	\fBpostmulti\fR \fB-e init\fR [\fB-v\fR]
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-e init\fR [\fB-v\fR]
 /*
-/*	\fBpostmulti\fR \fB-e create\fR [\fB-av\fR]
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-e create\fR [\fB-av\fR]
 /*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] [\fB-G \fIgroup\fR]
 /*	[\fB-I \fIname\fR] [\fIparam\fB=\fIvalue\fR ...]
 /*
-/*	\fBpostmulti\fR \fB-e import\fR [\fB-av\fR]
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-e import\fR [\fB-av\fR]
 /*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] [\fB-G \fIgroup\fR]
 /*	[\fB-I \fIname\fR] [\fBconfig_directory=\fI/path\fR]
 /*
-/*	\fBpostmulti\fR \fB-e destroy\fR [\fB-v\fR] \fB-i \fIname\fR
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-e destroy\fR [\fB-v\fR]
+/*	\fB-i \fIname\fR
 /*
-/*	\fBpostmulti\fR \fB-e deport\fR [\fB-v\fR] \fB-i \fIname\fR
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-e deport\fR [\fB-v\fR]
+/*	\fB-i \fIname\fR
 /*
-/*	\fBpostmulti\fR \fB-e enable\fR [\fB-v\fR] \fB-i \fIname\fR
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-e enable\fR [\fB-v\fR]
+/*	\fB-i \fIname\fR
 /*
-/*	\fBpostmulti\fR \fB-e disable\fR [\fB-v\fR] \fB-i \fIname\fR
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-e disable\fR [\fB-v\fR]
+/*	\fB-i \fIname\fR
 /*
-/*	\fBpostmulti\fR \fB-e assign\fR [\fB-v\fR] \fB-i \fIname\fR
-/*	[\fB-I \fIname\fR] [\fB-G \fIgroup\fR]
+/*	\fBpostmulti\fR [\fB-c \fIdir\fR] \fB-e assign\fR [\fB-v\fR]
+/*	\fB-i \fIname\fR [\fB-I \fIname\fR] [\fB-G \fIgroup\fR]
 /* DESCRIPTION
 /*	The \fBpostmulti\fR(1) command allows a Postfix administrator
 /*	to manage multiple Postfix instances on a single host.
@@ -47,13 +51,6 @@
 /*	instance's main.cf file. Postfix instances share program
 /*	files and documentation, but have their own configuration,
 /*	queue and data directories.
-/*
-/*	Currently, only the default Postfix instance can be used
-/*	as primary instance in a multi-instance configuration. The
-/*	\fBpostmulti\fR(1) command does not currently support a \fB-c\fR
-/*	option to select an alternative primary instance, and exits
-/*	with a fatal error if the \fBMAIL_CONFIG\fR environment
-/*	variable is set to a non-default configuration directory.
 /*
 /*	See the MULTI_INSTANCE_README tutorial for a more detailed
 /*	discussion of multi-instance management with \fBpostmulti\fR(1).
@@ -70,6 +67,32 @@
 /*	reason, each mode is documented in separate sections below.
 /* .SS "Common options"
 /*	All modes support the following options:
+/* .IP "\fB-c \fIdir\fR"
+/*	Experimental.
+/*	Specify \fIdir\fR as the configuration directory of the
+/*	primary instance.
+/*	Defaults to the value of the \fBMAIL_CONFIG\fR environment
+/*	variable if set, otherwise defaults to a compiled-in value.
+/*	To see the compiled-in default, run \fIpostconf -d
+/*	config_directory\fR.
+/*
+/*	This feature is available in Postfix 3.11 and later.
+/* .RS
+/* .IP \fBWARNING:\fR
+/*	This option is experimental.
+/*	It might not work as intended and may have unintended side
+/*	effects.
+/*	A warning message will be logged if the given directory
+/*	differs from the default value of the \fIconfig_directory\fR
+/*	configuration variable.
+/*	This option may be removed or its behavior changed in a future
+/*	version of Postfix.
+/*	Until this option is no longer marked as experimental,
+/*	production systems should neither use this option nor invoke
+/*	\fBpostmulti\fR(1) with the \fBMAIL_CONFIG\fR environment
+/*	variable set.
+/*	Please report any bugs.
+/* .RE
 /* .IP \fB-v\fR
 /*	Enable verbose logging for debugging purposes. Multiple
 /*	\fB-v\fR options make the software increasingly verbose.
@@ -300,6 +323,15 @@
 /* ENVIRONMENT
 /* .ad
 /* .fi
+/*	The behavior of the \fBpostmulti\fR(1) command can be affected
+/*	by the following environment variables:
+/* .IP \fBMAIL_CONFIG\fR
+/*	Experimental.
+/*	The default value of the \fB-c\fR option.
+/*	See the documentation of the \fB-c\fR option for details.
+/*
+/*	This feature is available in Postfix 3.11 and later.
+/* .PP
 /*	The \fBpostmulti\fR(1) command exports the following environment
 /*	variables before executing the requested \fIcommand\fR for a given
 /*	instance:
@@ -1615,7 +1647,7 @@ static NORETURN iterate(int iter_cmd, int iter_flags, int argc, char **argv,
 
 static NORETURN usage(const char *progname)
 {
-#define COMMON "    %s [-v] "
+#define COMMON "    %s [-c dir] [-v] "
     msg_error("Usage:");
     msg_error(COMMON "-l [-a] [-g group] [-i name] |", progname);
     msg_error(COMMON "-p [-a] [-g group] [-i name] command ... |", progname);
@@ -1650,7 +1682,6 @@ int     main(int argc, char **argv)
     int     fd;
     struct stat st;
     char   *slash;
-    char   *config_dir;
     int     ch;
     static const CONFIG_STR_TABLE str_table[] = {
 	VAR_MULTI_START_CMDS, DEF_MULTI_START_CMDS, &var_multi_start_cmds, 0, 0,
@@ -1705,6 +1736,16 @@ int     main(int argc, char **argv)
      */
     MAIL_VERSION_CHECK;
 
+    /* Pre-process the -c option so that the correct config is loaded. */
+    int saved_optind = optind;
+    while ((ch = GETOPT(argc, argv, ":c:")) > 0) {
+	if (ch == 'c') {
+	    check_setenv(CONF_ENV_PATH, optarg);
+	    break;
+	}
+    }
+    optind = saved_optind;
+
     /*
      * Process main.cf parameters. This is done before the GETOPT() loop to
      * improve logging. This assumes that no command-line option can affect
@@ -1714,16 +1755,17 @@ int     main(int argc, char **argv)
     get_mail_conf_str_table(str_table);
     maillog_client_init(argv[0], MAILLOG_CLIENT_FLAG_LOGWRITER_FALLBACK);
 
-    if ((config_dir = getenv(CONF_ENV_PATH)) != 0
-	&& strcmp(config_dir, DEF_CONFIG_DIR) != 0)
-	msg_fatal("Non-default configuration directory: %s=%s",
-		  CONF_ENV_PATH, config_dir);
+    if (strcmp(var_config_dir, DEF_CONFIG_DIR) != 0)
+	msg_warn("The primary instance's configuration directory is set to a "
+		 "value (%s) that differs from the default (%s).  Support for "
+		 "this is experimental; see the documentation for the "
+		 "postmulti(1) '-c' option.", var_config_dir, DEF_CONFIG_DIR);
 
     /*
      * Parse switches. Move the above mail_conf_read() block after this loop,
      * if any command-line option can affect parameter processing.
      */
-    while ((ch = GETOPT(argc, argv, "ae:g:i:G:I:lpRvx")) > 0) {
+    while ((ch = GETOPT(argc, argv, "ac:e:g:i:G:I:lpRvx")) > 0) {
 	switch (ch) {
 	default:
 	    usage(argv[0]);
@@ -1732,6 +1774,9 @@ int     main(int argc, char **argv)
 	    if (selection.type != INST_SEL_ALL)
 		instance_select_count++;
 	    selection.type = INST_SEL_ALL;
+	    break;
+	case 'c':
+	    /* Already handled above. */
 	    break;
 	case 'e':
 	    if ((code = EDIT_CMD_CODE(optarg)) < 0)

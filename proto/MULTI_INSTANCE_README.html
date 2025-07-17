@@ -675,10 +675,10 @@ make up a Postfix <b>instance</b>. </p>
 <h2><a name="default"><a name="primary"> The primary Postfix instance </a></a></h2>
 
 <p> One Postfix instance is special: this is the instance whose
-configuration directory is the default one compiled into the Postfix
-utilities. The location of the default configuration directory is
-typically /etc/postfix, and can be queried via the "postconf -d
-config_directory" command.
+configuration directory is given by the (experimental) postmulti(1)
+<b>-c dir</b> option.
+This directory typically defaults to /etc/postfix; run "postconf -d
+config_directory" to see the default.
 We call the instance with this configuration directory the "primary instance".
 Every other instance is called a "secondary instance". </p>
 
@@ -694,8 +694,7 @@ requested secondary configuration directory. </p>
 
 <p> So, while in most other respects, all instances are equal, the
 primary instance is "more equal than others". You may choose to create
-secondary instances, but you must have at least the primary instance,
-with its configuration directory in the default compiled-in location. </p>
+secondary instances, but you must have at least the primary instance. </p>
 
 <h2><a name="group"> Instance groups </a></h2>
 
