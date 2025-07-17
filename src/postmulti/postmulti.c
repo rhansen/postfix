@@ -1615,13 +1615,30 @@ static NORETURN iterate(int iter_cmd, int iter_flags, int argc, char **argv,
 
 static NORETURN usage(const char *progname)
 {
-    msg_fatal("Usage:"
-	      "%s -l [-v] [-a] [-g group] [-i instance] | "
-	      "%s -p [-v] [-a] [-g group] [-i instance] command... | "
-	      "%s -x [-v] [-a] [-i name] [-g group] command... | "
-	      "%s -e action [-v] [-a] [-i name] [-g group] [-I name] "
-	      "[-G group] [param=value ...]",
-	      progname, progname, progname, progname);
+#define COMMON "    %s [-v] "
+    msg_error("Usage:");
+    msg_error(COMMON "-l [-a] [-g group] [-i name] |", progname);
+    msg_error(COMMON "-p [-a] [-g group] [-i name] command ... |", progname);
+    msg_error(COMMON "-x [-a] [-g group] [-i name] command ... |", progname);
+    msg_error(COMMON "-e %s |", progname, EDIT_CMD_STR(EDIT_CMD_INIT));
+    msg_error(COMMON "-e %s [-a] [-g group] [-i name] [-G group] "
+	      "[-I name] [param=value ...] |",
+	      progname, EDIT_CMD_STR(EDIT_CMD_CREATE));
+    msg_error(COMMON "-e %s [-a] [-g group] [-i name] [-G group] "
+	      "[-I name] [config_directory=/path] |",
+	      progname, EDIT_CMD_STR(EDIT_CMD_IMPORT));
+    msg_error(COMMON "-e %s -i name |",
+	      progname, EDIT_CMD_STR(EDIT_CMD_DESTROY));
+    msg_error(COMMON "-e %s -i name |",
+	      progname, EDIT_CMD_STR(EDIT_CMD_DEPORT));
+    msg_error(COMMON "-e %s -i name |",
+	      progname, EDIT_CMD_STR(EDIT_CMD_ENABLE));
+    msg_error(COMMON "-e %s -i name |",
+	      progname, EDIT_CMD_STR(EDIT_CMD_DISABLE));
+    msg_error(COMMON "-e %s -i name [-G group] [-I name]",
+	      progname, EDIT_CMD_STR(EDIT_CMD_ASSIGN));
+#undef COMMON
+    exit(1);
 }
 
 MAIL_VERSION_STAMP_DECLARE;
