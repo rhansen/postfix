@@ -17,17 +17,17 @@
 /*	[\fB-i \fIname\fR]
 /*
 /*	\fBpostmulti\fR \fB-p\fR [\fB-av\fR] [\fB-g \fIgroup\fR]
-/*	[\fB-i \fIname\fR] \fIpostfix-command...\fR
+/*	[\fB-i \fIname\fR] \fIpostfix-command\fR ...
 /*
 /*	\fBpostmulti\fR \fB-x\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
-/*	[\fB-i \fIname\fR] \fIunix-command...\fR
+/*	[\fB-i \fIname\fR] \fIunix-command\fR ...
 /*
 /* .ti -4
 /*	\fBLife-cycle management:\fR
 /*
 /*	\fBpostmulti\fR \fB-e create\fR [\fB-av\fR]
 /*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] [\fB-G \fIgroup\fR]
-/*	[\fB-I \fIname\fR] [\fIparam=value\fR ...]
+/*	[\fB-I \fIname\fR] [\fIparam\fB=\fIvalue\fR ...]
 /*
 /*	\fBpostmulti\fR \fB-e import\fR [\fB-av\fR]
 /*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] [\fB-G \fIgroup\fR]
@@ -42,7 +42,7 @@
 /*	\fBpostmulti\fR \fB-e disable\fR [\fB-v\fR] \fB-i \fIname\fR
 /*
 /*	\fBpostmulti\fR \fB-e assign\fR [\fB-v\fR] \fB-i \fIname\fR
-/*	[\fB-I \fIname\fR] [-G \fIgroup\fR]
+/*	[\fB-I \fIname\fR] [\fB-G \fIgroup\fR]
 /* DESCRIPTION
 /*	The \fBpostmulti\fR(1) command allows a Postfix administrator
 /*	to manage multiple Postfix instances on a single host.
@@ -77,8 +77,8 @@
 /* ITERATOR MODE
 /* .ad
 /* .fi
-/*	In iterator mode, \fBpostmulti\fR performs the same operation
-/*	on all Postfix instances in turn.
+/*	In iterator mode, \fBpostmulti\fR(1) performs the same
+/*	operation on all Postfix instances in turn.
 /*
 /*	If multi-instance support is not enabled, the requested
 /*	command is performed just for the primary instance.
@@ -112,7 +112,7 @@
 /* .ad
 /* .fi
 /* .IP "\fB-p \fIpostfix-command\fR"
-/*	Invoke \fBpostfix(1)\fR to execute \fIpostfix-command\fR.
+/*	Invoke \fBpostfix\fR(1) to execute \fIpostfix-command\fR.
 /*	This option implements the \fBpostfix-wrapper\fR(5) interface.
 /* .RS
 /* .IP \(bu
@@ -139,7 +139,9 @@
 /*	invoke \fBpostmulti\fR(1) as follows:
 /* .RS
 /* .IP
+/* .nf
 /*	# postmulti -g msa -p start
+/* .fi
 /* .RE
 /* Command mode
 /* .ad
@@ -318,13 +320,13 @@
 /*	the instance will not be started etc. with "postfix start",
 /*	"postmulti -p start" and so on. The instance can still be
 /*	started etc. with "postfix -c config-directory start".
+/* .RE
 /* Other options
 /* .ad
 /* .fi
 /* .IP \fB-v\fR
 /*	Enable verbose logging for debugging purposes. Multiple
 /*	\fB-v\fR options make the software increasingly verbose.
-/* .RE
 /* ENVIRONMENT
 /* .ad
 /* .fi
