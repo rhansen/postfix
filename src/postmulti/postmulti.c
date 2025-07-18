@@ -4,45 +4,50 @@
 /* SUMMARY
 /*	Postfix multi-instance manager
 /* SYNOPSIS
-/* .fi
-/* .ti -4
-/*	\fBEnabling multi-instance management:\fR
-/*
-/*	\fBpostmulti\fR \fB-e init\fR [\fB-v\fR]
-/*
-/* .ti -4
-/*	\fBIterator mode:\fR
-/*
-/*	\fBpostmulti\fR \fB-l\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
+/* .SS "Enabling multi-instance management:"
+/* .SY postmulti
+/*	\fB-e init\fR [\fB-v\fR]
+/* .YS
+/* .SS "Iterator mode:"
+/* .SY postmulti
+/*	\fB-l\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
 /*	[\fB-i \fIname\fR]
-/*
-/*	\fBpostmulti\fR \fB-p\fR [\fB-av\fR] [\fB-g \fIgroup\fR]
-/*	[\fB-i \fIname\fR] \fIpostfix-command...\fR
-/*
-/*	\fBpostmulti\fR \fB-x\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
-/*	[\fB-i \fIname\fR] \fIunix-command...\fR
-/*
-/* .ti -4
-/*	\fBLife-cycle management:\fR
-/*
-/*	\fBpostmulti\fR \fB-e create\fR [\fB-av\fR]
+/* .YS
+/* .SY postmulti
+/*	\fB-p\fR [\fB-av\fR] [\fB-g \fIgroup\fR]
+/*	[\fB-i \fIname\fR] \fIpostfix-command\fR ...
+/* .YS
+/* .SY postmulti
+/*	\fB-x\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
+/*	[\fB-i \fIname\fR] \fIunix-command\fR ...
+/* .YS
+/* .SS "Life-cycle management:"
+/* .SY postmulti
+/*	\fB-e create\fR [\fB-av\fR]
 /*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] [\fB-G \fIgroup\fR]
-/*	[\fB-I \fIname\fR] [\fIparam=value\fR ...]
-/*
-/*	\fBpostmulti\fR \fB-e import\fR [\fB-av\fR]
+/*	[\fB-I \fIname\fR] [\fIparam\fB=\fIvalue\fR ...]
+/* .YS
+/* .SY postmulti
+/*	\fB-e import\fR [\fB-av\fR]
 /*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] [\fB-G \fIgroup\fR]
 /*	[\fB-I \fIname\fR] [\fBconfig_directory=\fI/path\fR]
-/*
-/*	\fBpostmulti\fR \fB-e destroy\fR [\fB-v\fR] \fB-i \fIname\fR
-/*
-/*	\fBpostmulti\fR \fB-e deport\fR [\fB-v\fR] \fB-i \fIname\fR
-/*
-/*	\fBpostmulti\fR \fB-e enable\fR [\fB-v\fR] \fB-i \fIname\fR
-/*
-/*	\fBpostmulti\fR \fB-e disable\fR [\fB-v\fR] \fB-i \fIname\fR
-/*
-/*	\fBpostmulti\fR \fB-e assign\fR [\fB-v\fR] \fB-i \fIname\fR
-/*	[\fB-I \fIname\fR] [-G \fIgroup\fR]
+/* .YS
+/* .SY postmulti
+/*	\fB-e destroy\fR [\fB-v\fR] \fB-i \fIname\fR
+/* .YS
+/* .SY postmulti
+/*	\fB-e deport\fR [\fB-v\fR] \fB-i \fIname\fR
+/* .YS
+/* .SY postmulti
+/*	\fB-e enable\fR [\fB-v\fR] \fB-i \fIname\fR
+/* .YS
+/* .SY postmulti
+/*	\fB-e disable\fR [\fB-v\fR] \fB-i \fIname\fR
+/* .YS
+/* .SY postmulti
+/*	\fB-e assign\fR [\fB-v\fR] \fB-i \fIname\fR
+/*	[\fB-I \fIname\fR] [\fB-G \fIgroup\fR]
+/* .YS
 /* DESCRIPTION
 /*	The \fBpostmulti\fR(1) command allows a Postfix administrator
 /*	to manage multiple Postfix instances on a single host.
@@ -77,14 +82,14 @@
 /* ITERATOR MODE
 /* .ad
 /* .fi
-/*	In iterator mode, \fBpostmulti\fR performs the same operation
+/*	In iterator mode, \fBpostmulti\fR(1) performs the same operation
 /*	on all Postfix instances in turn.
 /*
 /*	If multi-instance support is not enabled, the requested
 /*	command is performed just for the primary instance.
 /* .PP
 /*	Iterator mode implements the following command options:
-/* .SH "Instance selection"
+/* .SS "Instance selection"
 /* .IP \fB-a\fR
 /*	Perform the operation on all instances. This is the default.
 /* .IP "\fB-g \fIgroup\fR"
@@ -100,13 +105,13 @@
 /*	are started before "source" instances.
 /* .sp
 /*	This option cannot be used with \fB-p\fR.
-/* .SH "List mode"
+/* .SS "List mode"
 /* .IP \fB-l\fR
 /*	List Postfix instances with their instance name, instance
 /*	group name, enable/disable status and configuration directory.
-/* .SH "Postfix-wrapper mode"
+/* .SS "Postfix-wrapper mode"
 /* .IP "\fB-p \fIpostfix-command\fR"
-/*	Invoke \fBpostfix(1)\fR to execute \fIpostfix-command\fR.
+/*	Invoke \fBpostfix\fR(1) to execute \fIpostfix-command\fR.
 /*	This option implements the \fBpostfix-wrapper\fR(5) interface.
 /* .RS
 /* .IP \(bu
@@ -131,11 +136,13 @@
 /*	start/stop/etc.  a named instance or instance group. For
 /*	example, to start just the instances in the group "msa",
 /*	invoke \fBpostmulti\fR(1) as follows:
-/* .RS
 /* .IP
+/* .in +4n
+/* .nf
 /*	# postmulti -g msa -p start
-/* .RE
-/* .SH "Command mode"
+/* .fi
+/* .in
+/* .SS "Command mode"
 /* .IP "\fB-x \fIunix-command\fR"
 /*	Execute the specified \fIunix-command\fR for all Postfix instances.
 /*	The command runs with appropriate environment settings for
@@ -143,7 +150,7 @@
 /*	config_directory, queue_directory, data_directory,
 /*	multi_instance_name, multi_instance_group and
 /*	multi_instance_enable.
-/* .SH "Other options"
+/* .SS "Other options"
 /* .IP \fB-v\fR
 /*	Enable verbose logging for debugging purposes. Multiple
 /*	\fB-v\fR options make the software increasingly verbose.
@@ -155,7 +162,7 @@
 /*	multi-instance status of an existing instance.
 /* .PP
 /*	The following options are implemented:
-/* .SH "Existing instance selection"
+/* .SS "Existing instance selection"
 /* .IP \fB-a\fR
 /*	When creating or importing an instance, place the new
 /*	instance at the front of the secondary instance list.
@@ -170,7 +177,7 @@
 /*	With other life-cycle operations, apply the operation to
 /*	the named existing instance.  Specify "-" to select the
 /*	primary Postfix instance.
-/* .SH "New or existing instance name assignment"
+/* .SS "New or existing instance name assignment"
 /* .IP "\fB-I \fIname\fR"
 /*	Assign the specified instance \fIname\fR to an existing
 /*	instance, newly-created instance, or imported instance.
@@ -181,7 +188,7 @@
 /* .IP "\fB-G \fIgroup\fR"
 /*	Assign the specified \fIgroup\fR name to an existing instance
 /*	or to a newly created or imported instance.
-/* .SH "Instance creation/deletion/status change"
+/* .SS "Instance creation/deletion/status change"
 /* .IP "\fB-e \fIaction\fR"
 /*	"Edit" managed instances. The following actions are supported:
 /* .RS
@@ -190,14 +197,14 @@
 /*	used to manage Postfix instances.  The "postmulti -e init"
 /*	command updates the primary instance's main.cf file by
 /*	setting:
-/* .RS
 /* .IP
+/* .in +4n
 /* .nf
 /*	multi_instance_wrapper =
 /*		${command_directory}/postmulti -p --
 /*	multi_instance_enable = yes
 /* .fi
-/* .RE
+/* .in
 /* .IP
 /*	You can set these by other means if you prefer.
 /* .IP \fBcreate\fR
@@ -221,8 +228,8 @@
 /*	Optional "name=value" arguments specify the instance
 /*	config_directory, queue_directory and data_directory.
 /*	For example:
-/* .RS
 /* .IP
+/* .in +4n
 /* .nf
 /*	# postmulti -I postfix-mumble \e
 /*		-G mygroup -e create \e
@@ -230,7 +237,7 @@
 /*		queue_directory=/my/queue/dir \e
 /*		data_directory=/my/data/dir
 /* .fi
-/* .RE
+/* .in
 /* .IP
 /*	If any of these pathnames is not supplied, the program
 /*	attempts to generate the missing pathname(s) by taking the
@@ -302,11 +309,11 @@
 /*	the instance will not be started etc. with "postfix start",
 /*	"postmulti -p start" and so on. The instance can still be
 /*	started etc. with "postfix -c config-directory start".
-/* .SH "Other options"
+/* .RE
+/* .SS "Other options"
 /* .IP \fB-v\fR
 /*	Enable verbose logging for debugging purposes. Multiple
 /*	\fB-v\fR options make the software increasingly verbose.
-/* .RE
 /* ENVIRONMENT
 /* .ad
 /* .fi
