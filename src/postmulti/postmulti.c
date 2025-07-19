@@ -6,12 +6,7 @@
 /* SYNOPSIS
 /* .fi
 /* .ti -4
-/*	\fBEnabling multi-instance management:\fR
-/*
-/*	\fBpostmulti\fR \fB-e init\fR [\fB-v\fR]
-/*
-/* .ti -4
-/*	\fBIterator mode:\fR
+/*	\fBIterator modes\fR
 /*
 /*	\fBpostmulti\fR \fB-l\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
 /*	[\fB-i \fIname\fR]
@@ -23,7 +18,9 @@
 /*	[\fB-i \fIname\fR] \fIunix-command\fR ...
 /*
 /* .ti -4
-/*	\fBLife-cycle management:\fR
+/*	\fBLife-cycle management modes\fR
+/*
+/*	\fBpostmulti\fR \fB-e init\fR [\fB-v\fR]
 /*
 /*	\fBpostmulti\fR \fB-e create\fR [\fB-av\fR]
 /*	[\fB-g \fIgroup\fR] [\fB-i \fIname\fR] [\fB-G \fIgroup\fR]
@@ -46,16 +43,7 @@
 /* DESCRIPTION
 /*	The \fBpostmulti\fR(1) command allows a Postfix administrator
 /*	to manage multiple Postfix instances on a single host.
-/*
-/*	\fBpostmulti\fR(1) implements two fundamental modes of
-/*	operation.  In \fBiterator\fR mode, it executes the same
-/*	command for multiple Postfix instances.  In \fBlife-cycle
-/*	management\fR mode, it adds or deletes one instance, or
-/*	changes the multi-instance status of one instance.
-/*
-/*	Each mode of operation has its own command syntax. For this
-/*	reason, each mode is documented in separate sections below.
-/* BACKGROUND
+/* Background
 /* .ad
 /* .fi
 /*	A multi-instance configuration consists of one primary
@@ -74,28 +62,48 @@
 /*
 /*	See the MULTI_INSTANCE_README tutorial for a more detailed
 /*	discussion of multi-instance management with \fBpostmulti\fR(1).
-/* ITERATOR MODE
+/* Modes of operation
 /* .ad
 /* .fi
-/*	In iterator mode, \fBpostmulti\fR(1) performs the same
-/*	operation on all Postfix instances in turn.
+/*	\fBpostmulti\fR(1) has several modes of operation, grouped
+/*	into two general categories: \fIiterator\fR modes and
+/*	\fIlife-cycle management\fR modes.
+/*	Iterator modes perform the same operation on multiple Postfix
+/*	instances.
+/*	Life-cycle management modes change a single instance's
+/*	membership or status.
+/*
+/*	Each mode of operation has its own command syntax. For this
+/*	reason, each mode is documented in separate sections below.
+/* Common options
+/* .ad
+/* .fi
+/*	All modes support the following options:
+/* .IP \fB-v\fR
+/*	Enable verbose logging for debugging purposes. Multiple
+/*	\fB-v\fR options make the software increasingly verbose.
+/* ITERATOR MODES
+/* .ad
+/* .fi
+/*	For the modes categorized as iterator modes,
+/*	\fBpostmulti\fR(1) performs the same operation on all selected
+/*	Postfix instances in turn.
 /*
 /*	If multi-instance support is not enabled, the requested
 /*	command is performed just for the primary instance.
-/* .PP
-/*	Iterator mode implements the following command options:
-/* Instance selection
+/* Common options for iterator modes
 /* .ad
 /* .fi
+/*	The following instance selection options are common among the
+/*	iterator modes:
 /* .IP \fB-a\fR
 /*	Perform the operation on all instances. This is the default.
 /* .IP "\fB-g \fIgroup\fR"
 /*	Perform the operation only for members of the named \fIgroup\fR.
 /* .IP "\fB-i \fIname\fR"
-/*	Perform the operation only for the instance with the specified
-/*	\fIname\fR.  You can specify either the instance name
-/*	or the absolute pathname of the instance's configuration
-/*	directory.  Specify "-" to select the primary Postfix instance.
+/*	Perform the operation only for the instance whose name or
+/*	configuration directory (absolute pathname) is \fIname\fR.
+/*	You can use "\fB-\fR" to select the primary Postfix instance.
 /* .IP \fB-R\fR
 /*	Reverse the iteration order. This may be appropriate when
 /*	updating a multi-instance system, where "sink" instances
@@ -153,57 +161,47 @@
 /*	config_directory, queue_directory, data_directory,
 /*	multi_instance_name, multi_instance_group and
 /*	multi_instance_enable.
-/* Other options
+/* LIFE-CYCLE MANAGEMENT MODES
 /* .ad
 /* .fi
-/* .IP \fB-v\fR
-/*	Enable verbose logging for debugging purposes. Multiple
-/*	\fB-v\fR options make the software increasingly verbose.
-/* LIFE-CYCLE MANAGEMENT MODE
-/* .ad
-/* .fi
-/*	With the \fB-e\fR option \fBpostmulti\fR(1) can be used to
+/*	With the \fB-e\fR option, \fBpostmulti\fR(1) can be used to
 /*	add or delete a Postfix instance, and to manage the
 /*	multi-instance status of an existing instance.
-/* .PP
-/*	The following options are implemented:
-/* Existing instance selection
+/* Common options for life-cycle management modes
 /* .ad
 /* .fi
+/*	The following options are common among various life-cycle
+/*	management modes:
 /* .IP \fB-a\fR
-/*	When creating or importing an instance, place the new
-/*	instance at the front of the secondary instance list.
+/*	For \fBcreate\fR, \fBimport\fR: Place the new instance at the
+/*	front of the secondary instance list.
 /* .IP "\fB-g \fIgroup\fR"
-/*	When creating or importing an instance, place the new
-/*	instance before the first secondary instance that is a
-/*	member of the specified group.
+/*	For \fBcreate\fR, \fBimport\fR: Place the new instance before
+/*	the first secondary instance that is a member of the specified
+/*	\fIgroup\fR.
 /* .IP "\fB-i \fIname\fR"
-/*	When creating or importing an instance, place the new
-/*	instance before the matching secondary instance.
-/* .sp
-/*	With other life-cycle operations, apply the operation to
-/*	the named existing instance.  Specify "-" to select the
-/*	primary Postfix instance.
-/* New or existing instance name assignment
-/* .ad
-/* .fi
+/*	For \fBcreate\fR, \fBimport\fR: Place the new instance before
+/*	the secondary instance whose name or configuration directory
+/*	(absolute pathname) is \fIname\fR.
+/*
+/*	For other life-cycle management modes except \fBinit\fR: Apply
+/*	the operation to the existing instance whose name or
+/*	configuration directory (absolute pathname) is \fIname\fR.
+/*	You can use "\fB-\fR" to select the primary Postfix instance.
 /* .IP "\fB-I \fIname\fR"
-/*	Assign the specified instance \fIname\fR to an existing
-/*	instance, newly-created instance, or imported instance.
+/*	For \fBcreate\fR, \fBimport\fR, \fBassign\fR: Assign the
+/*	specified instance \fIname\fR to the instance.
 /*	Instance
 /*	names other than "-" (which makes the instance "nameless")
 /*	must start with "postfix-".  This restriction reduces the
 /*	likelihood of name collisions with system files.
 /* .IP "\fB-G \fIgroup\fR"
-/*	Assign the specified \fIgroup\fR name to an existing instance
-/*	or to a newly created or imported instance.
-/* Instance creation/deletion/status change
+/*	For \fBcreate\fR, \fBimport\fR, \fBassign\fR: Assign the
+/*	specified \fIgroup\fR name to the instance.
+/* Mode selection
 /* .ad
 /* .fi
-/* .IP "\fB-e \fIaction\fR"
-/*	"Edit" managed instances. The following actions are supported:
-/* .RS
-/* .IP \fBinit\fR
+/* .IP "\fB-e init\fR"
 /*	This command is required before \fBpostmulti\fR(1) can be
 /*	used to manage Postfix instances.  The "postmulti -e init"
 /*	command updates the primary instance's main.cf file by
@@ -218,7 +216,7 @@
 /* .RE
 /* .IP
 /*	You can set these by other means if you prefer.
-/* .IP \fBcreate\fR
+/* .IP "\fB-e create\fR"
 /*	Create a new Postfix instance and add it to the
 /*	multi_instance_directories parameter of the primary instance.
 /*	The "\fB-I \fIname\fR" option is recommended to give the
@@ -259,7 +257,7 @@
 /*	contains both a main.cf and master.cf file, \fBcreate\fR
 /*	will "import" the instance as-is. For existing instances,
 /*	\fBcreate\fR and \fBimport\fR are identical.
-/* .IP \fBimport\fR
+/* .IP "\fB-e import\fR"
 /*	Import an existing instance into the list of instances
 /*	managed by the \fBpostmulti\fR(1) multi-instance manager.
 /*	This adds the instance to the multi_instance_directories
@@ -270,7 +268,7 @@
 /*	"\fB-G \fIgroup\fR" option may be used to assign the instance
 /*	to a group. Add a "\fBconfig_directory=\fI/path\fR" argument
 /*	to override a default pathname based on "\fB-I \fIname\fR".
-/* .IP \fBdestroy\fR
+/* .IP "\fB-e destroy\fR"
 /*	Destroy a secondary Postfix instance. To be a candidate for
 /*	destruction an instance must be disabled, stopped and its
 /*	queue must not contain any messages. Attempts to destroy
@@ -300,33 +298,26 @@
 /*	file removal operations. Make sure the instance's data,
 /*	queue and configuration directories are set correctly and
 /*	do not contain any valuable files.
-/* .IP \fBdeport\fR
+/* .IP "\fB-e deport\fR"
 /*	Deport a secondary instance from the list of managed
 /*	instances. This deletes the instance configuration directory
 /*	from the primary instance's multi_instance_directories list,
 /*	but does not remove any files or directories.
-/* .IP \fBassign\fR
+/* .IP "\fB-e assign\fR"
 /*	Assign a new instance name or a new group name to the
 /*	selected instance.  Use "\fB-G -\fR" to specify "no group"
 /*	and "\fB-I -\fR" to specify "no name".  If you choose to
 /*	make an instance "nameless", set a suitable syslog_name in
 /*	the corresponding main.cf file.
-/* .IP \fBenable\fR
+/* .IP "\fB-e enable\fR"
 /*	Mark the selected instance as enabled. This just sets the
 /*	multi_instance_enable parameter to "yes" in the instance's
 /*	main.cf file.
-/* .IP \fBdisable\fR
+/* .IP "\fB-e disable\fR"
 /*	Mark the selected instance as disabled. This means that
 /*	the instance will not be started etc. with "postfix start",
 /*	"postmulti -p start" and so on. The instance can still be
 /*	started etc. with "postfix -c config-directory start".
-/* .RE
-/* Other options
-/* .ad
-/* .fi
-/* .IP \fB-v\fR
-/*	Enable verbose logging for debugging purposes. Multiple
-/*	\fB-v\fR options make the software increasingly verbose.
 /* ENVIRONMENT
 /* .ad
 /* .fi
