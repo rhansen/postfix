@@ -1096,12 +1096,10 @@ int     main(int argc, char **argv)
     if ((query == 0 || strcmp(query, "-") != 0)
 	&& (postmap_flags & POSTMAP_FLAG_ANY_KEY))
 	msg_fatal("specify -b -h or -m only with \"-q -\"");
-    if ((postmap_flags & POSTMAP_FLAG_ANY_KEY) != 0
-	&& (postmap_flags & POSTMAP_FLAG_ANY_KEY)
-	== (postmap_flags & POSTMAP_FLAG_MIME_KEY))
+    if ((postmap_flags & POSTMAP_FLAG_MIME_KEY)
+	&& !(postmap_flags & POSTMAP_FLAG_HB_KEY))
 	msg_warn("ignoring -m option without -b or -h");
-    if ((postmap_flags & (POSTMAP_FLAG_ANY_KEY & ~POSTMAP_FLAG_MIME_KEY))
-	&& force_utf8 == 0)
+    if ((postmap_flags & POSTMAP_FLAG_HB_KEY) && !force_utf8)
 	dict_flags &= ~DICT_FLAG_UTF8_MASK;
 
     /*
