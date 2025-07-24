@@ -28,7 +28,8 @@ update: ../../bin/$(PROG)
 	cp $(PROG) ../../bin
 
 tests:	test1 test2 fail_test quote_test file_test lmdb_abb_test \
-	lmdb_bulk_test lmdb_incr_test cdb_bulk_test mode_conflict_test
+	lmdb_bulk_test lmdb_incr_test cdb_bulk_test mode_conflict_test \
+	json_test
 
 root_tests:
 
@@ -136,6 +137,13 @@ lmdb_incr_test: $(PROG)
 	    LANG=C sort > lmdb_retry.tmp)
 	cmp lmdb_retry lmdb_retry.tmp
 	rm -f lmdb_retry lmdb_retry.tmp lmdb_retry.lmdb main.cf
+
+json_test: $(PROG) json_test.sh json_test.ref
+	rm -f json_test.tmp main.cf
+	touch -t 197101010000 main.cf
+	$(SHLIB_ENV) ./json_test.sh >json_test.tmp 2>&1
+	diff json_test.ref json_test.tmp
+	rm -f json_test.tmp main.cf
 
 clean:
 	rm -f *.o *core $(PROG) $(TESTPROG) *.tmp junk *.db main.cf master.cf
