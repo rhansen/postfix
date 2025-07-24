@@ -1,0 +1,58 @@
+>>>>>> -q <not-hyphen> -j
+>>> value -> "value"
+"value"
+>>> UTF-8 encoded sparkles emoji value -> "✨"
+"✨"
+>>> invalid UTF-8 value -> error
+postmap: fatal: table static:?: encoding error: the value is not valid UTF-8 and cannot be written as a JSON string: ?
+>>> invalid UTF-8 key but valid value -> "value"
+"value"
+
+>>>>>> -q - -j
+>>> ASCII and valid UTF-8 keys, ASCII value -> objects
+{"key":"key","value":"value"}
+{"key":"✨","value":"value"}
+>>> ASCII and valid UTF-8 keys, valid UTF-8 value -> objects
+{"key":"key","value":"✨"}
+{"key":"✨","value":"✨"}
+>>> ASCII and valid UTF-8 keys, invalid UTF-8 value -> error
+postmap: fatal: table static:?: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=key value=?
+>>> ASCII, invalid UTF-8, and valid UTF-8 keys, ASCII value -> error
+postmap: fatal: table static:value: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=? value=value
+
+>>>>>> -q - -h -j
+>>> valid keys and value -> ok
+{"key":"FieldName1: FieldBody1","value":"✨"}
+{"key":"FieldName2: FieldBody2\n with ✨","value":"✨"}
+>>> invalid keys, valid value -> error
+postmap: fatal: table static:???: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=FieldName2: FieldBody2? with ? value=???
+>>> valid keys, invalid value -> error
+postmap: fatal: table static:?: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=FieldName1: FieldBody1 value=?
+
+>>>>>> -q - -b -j
+>>> valid keys and value -> ok
+{"key":"","value":"✨"}
+{"key":"Body","value":"✨"}
+{"key":"✨","value":"✨"}
+>>> invalid keys, valid value -> error
+postmap: fatal: table static:???: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=? value=???
+>>> valid keys, invalid value -> error
+postmap: fatal: table static:?: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key= value=?
+
+>>>>>> -q - -m -h -j
+>>> valid keys and value -> ok
+{"key":"FieldName1: FieldBody1","value":"✨"}
+{"key":"FieldName2: FieldBody2\n with ✨","value":"✨"}
+>>> invalid keys, valid value -> error
+postmap: fatal: table static:???: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=FieldName2: FieldBody2? with ? value=???
+>>> valid keys, invalid value -> error
+postmap: fatal: table static:?: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=FieldName1: FieldBody1 value=?
+
+>>>>>> -s -j
+>>> valid keys and value -> ok
+{"key":"key","value":"✨"}
+{"key":"✨","value":"value"}
+>>> invalid key, valid value -> error
+postmap: fatal: table inline:{key=???,?=value}: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=? value=value
+>>> valid key, invalid value -> error
+postmap: fatal: table inline:{key=?,???=value}: encoding error: the key and/or value is not valid UTF-8 and cannot be written as a JSON string: key=key value=?

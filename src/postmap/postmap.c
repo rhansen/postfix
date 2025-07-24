@@ -138,6 +138,11 @@
 /*	Incremental mode. Read entries from standard input and do not
 /*	truncate an existing database. By default, \fBpostmap\fR(1) creates
 /*	a new database from the entries in \fBfile_name\fR.
+/* .IP \fB-j\fR
+/*	Output results in JSON format.
+/*	Only valid when combined with the \fB-q\fR or \fB-s\fR option.
+/*
+/*	This feature is available in Postfix version 3.11 and later.
 /* .IP \fB-m\fR
 /*	Enable MIME parsing with "\fB-b\fR" and "\fB-h\fR".
 /*
@@ -161,28 +166,83 @@
 /*	when creating a new file.  Instead, create a new file with default
 /*	access permissions (mode 0644).
 /* .IP "\fB-q \fIkey\fR"
-/*	Search the specified maps for \fIkey\fR and write the first value
-/*	found to the standard output stream. The exit status is zero
-/*	when the requested information was found.
+/*	Search each of the given maps for \fIkey\fR and write the
+/*	first value found to the standard output stream, followed by a
+/*	newline.
+/*	If none of the tables have an entry for \fIkey\fR, nothing is
+/*	written.
+/*	If a table reports an error, an error message is logged and
+/*	\fBpostmap\fR(1) immediately exits without performing further
+/*	lookups.
+/*	The exit status is zero when the requested information was
+/*	found, and non-zero otherwise.
 /*
 /*	Note: this performs a single query with the key as specified,
 /*	and does not make iterative queries with substrings of the
 /*	key as described for access(5), canonical(5), transport(5),
 /*	virtual(5) and other Postfix table-driven features.
 /*
-/*	If a key value of \fB-\fR is specified, the program reads key
-/*	values from the standard input stream and writes one line of
-/*	\fIkey value\fR output for each key that was found. The exit
-/*	status is zero when at least one of the requested keys was found.
+/*	If the \fB-j\fR option is also given, the value is written as
+/*	a JSON string value, instead of raw.
+/*	The value must be a valid UTF-8 string; if it is not,
+/*	\fBpostmap\fR(1) exits with an error.
+/*	Example:
+/* .RS
+/* .IP
+/* .nf
+/*	"this value has uncommon chars: \\n \\t \\\\ \\" \\u007f"
+/* .fi
+/* .RE
+/* .IP
+/*	If \fIkey\fR is "\fB-\fR", each line of the standard input
+/*	stream is treated as an independent key to query.
+/*	The exit status is zero when at least one of the requested
+/*	keys was found and no errors occurred, and non-zero otherwise.
+/*	Each key is processed as described above, except the output
+/*	format upon finding a value is changed:
+/* .RS
+/* .IP \(bu
+/*	Without \fB-j\fR, the output has the form "\fIkey\fR
+/*	\fIvalue\fR" where \fIkey\fR and \fIvalue\fR are separated by
+/*	a tab character.
+/* .IP \(bu
+/*	With \fB-j\fR, the output is a newline-delimited JSON object
+/*	on a single line with \fBkey\fR and \fBvalue\fR string
+/*	properties.
+/*	If either the key or the value is not a UTF-8 string,
+/*	\fBpostmap\fR(1) exits with an error.
+/*	Example:
+/* .RS
+/* .IP
+/* .nf
+/*	{"key":"key goes here","value":"value goes here"}
+/* .fi
+/* .RE
+/* .RE
 /* .IP \fB-r\fR
 /*	When updating a table, do not complain about attempts to update
 /*	existing entries, and make those updates anyway.
 /* .IP \fB-s\fR
-/*	Retrieve all database elements, and write one line of
-/*	\fIkey value\fR output for each element. The elements are
-/*	printed in database order, which is not necessarily the same
-/*	as the original input order.
+/*	Retrieve all database elements, and write one line of output
+/*	for each element.
+/*	The output has the form \fIkey value\fR, where \fIkey\fR and
+/*	\fIvalue\fR are separated by a tab character.
+/*	The elements are printed in database order, which is not
+/*	necessarily the same as the original input order.
 /*
+/*	If the \fB-j\fR option is also given, the output is a stream
+/*	of newline-delimited objects with \fBkey\fR and \fBvalue\fR
+/*	string properties.
+/*	If either the key or the value is not a UTF-8 string,
+/*	\fBpostmap\fR(1) exits with an error.
+/*	Example:
+/* .RS
+/* .IP
+/* .nf
+/*	{"key":"key goes here","value":"value goes here"}
+/* .fi
+/* .RE
+/* .IP
 /*	This feature is available in Postfix version 2.2 and later,
 /*	and is not available for all database types.
 /* .IP \fB-u\fR
@@ -370,6 +430,7 @@
 #define POSTMAP_FLAG_HEADER_KEY	(1<<2)	/* apply to header text */
 #define POSTMAP_FLAG_BODY_KEY	(1<<3)	/* apply to body text */
 #define POSTMAP_FLAG_MIME_KEY	(1<<4)	/* enable MIME parsing */
+#define POSTMAP_FLAG_JSON_OUT	(1<<5)	/* output as JSON */
 
 #define POSTMAP_FLAG_HB_KEY (POSTMAP_FLAG_HEADER_KEY | POSTMAP_FLAG_BODY_KEY)
 #define POSTMAP_FLAG_FULL_KEY (POSTMAP_FLAG_BODY_KEY | POSTMAP_FLAG_MIME_KEY)
@@ -384,9 +445,62 @@ typedef struct {
     char  **maps;			/* map names */
     int     map_count;			/* yes, indeed */
     int     dict_flags;			/* query flags */
+    int     postmap_flags;		/* postmap flags */
     int     header_done;		/* past primary header */
     int     found;			/* result */
 } POSTMAP_KEY_STATE;
+
+/*
+ * write_keyval - print found lookup value
+ *
+ * keylen and vallen can be -1 to indicate unknown; the null terminator will be
+ * used to find the end of the string.  key and val must be null terminated even
+ * if keylen and vallen are non-negative.  key is required even if value_only is
+ * true.
+ */
+
+static void write_keyval(const char *dict_type, const char *dict_name,
+			 int postmap_flags, int value_only,
+			 const char *key, ssize_t keylen,
+			 const char *value, ssize_t valuelen)
+{
+    if (value == 0)
+	return;
+    if (*value == 0) {
+	msg_warn("table %s:%s: key %s: empty string result is not allowed",
+		 dict_type, dict_name, key);
+	msg_warn("table %s:%s should return NO RESULT in case of NOT FOUND",
+		 dict_type, dict_name);
+    }
+    if (postmap_flags & POSTMAP_FLAG_JSON_OUT) {
+	static VSTRING *buf = 0;
+	if (buf == 0)
+	    buf = vstring_alloc(100);
+	if (value_only) {
+	    if ((valuelen < 0 && !valid_utf8_stringz(value))
+		|| (valuelen >= 0 && !valid_utf8_string(value, valuelen)))
+		msg_fatal("table %s:%s: encoding error: the value is not valid "
+			  "UTF-8 and cannot be written as a JSON string: %s",
+			  dict_type, dict_name, value);
+	    vstream_printf("\"%s\"\n", quote_for_json(buf, value, valuelen));
+	} else {
+	    if (!valid_utf8_stringz(key) || !valid_utf8_stringz(value))
+		msg_fatal("table %s:%s: encoding error: the key and/or value "
+			  "is not valid UTF-8 and cannot be written as a JSON "
+			  "string: key=%s value=%s",
+			  dict_type, dict_name, key, value);
+	    vstream_printf("{\"key\":\"%s\",",
+			   quote_for_json(buf, key, keylen));
+	    vstream_printf("\"value\":\"%s\"}\n",
+			   quote_for_json(buf, value, valuelen));
+	}
+    } else {
+	if (value_only)
+	    vstream_printf("%s\n", value);
+	else
+	    vstream_printf("%s	%s\n", key, value);
+    }
+}
 
 /* postmap - create or update mapping database */
 
@@ -611,13 +725,8 @@ static void postmap_body(void *ptr, int unused_rec_type,
 			dict_open3(maps[n], map_name, O_RDONLY, dict_flags) :
 		    dict_open3(var_db_type, maps[n], O_RDONLY, dict_flags));
 	if ((value = dict_get(dicts[n], keybuf)) != 0) {
-	    if (*value == 0) {
-		msg_warn("table %s:%s: key %s: empty string result is not allowed",
-			 dicts[n]->type, dicts[n]->name, keybuf);
-		msg_warn("table %s:%s should return NO RESULT in case of NOT FOUND",
-			 dicts[n]->type, dicts[n]->name);
-	    }
-	    vstream_printf("%s	%s\n", keybuf, value);
+	    write_keyval(dicts[n]->type, dicts[n]->name, state->postmap_flags,
+			 0, keybuf, -1, value, -1);
 	    state->found = 1;
 	    break;
 	}
@@ -694,13 +803,8 @@ static int postmap_queries(VSTREAM *in, char **maps, const int map_count,
 			 dict_file_lookup : dicts[n]->lookup)
 		    (dicts[n], STR(keybuf));
 		if (value != 0) {
-		    if (*value == 0) {
-			msg_warn("table %s:%s: key %s: empty string result is not allowed",
-			       dicts[n]->type, dicts[n]->name, STR(keybuf));
-			msg_warn("table %s:%s should return NO RESULT in case of NOT FOUND",
-				 dicts[n]->type, dicts[n]->name);
-		    }
-		    vstream_printf("%s	%s\n", STR(keybuf), value);
+		    write_keyval(dicts[n]->type, dicts[n]->name, postmap_flags,
+				 0, STR(keybuf), LEN(keybuf), value, -1);
 		    found = 1;
 		    break;
 		}
@@ -728,6 +832,7 @@ static int postmap_queries(VSTREAM *in, char **maps, const int map_count,
 	key_state.maps = maps;
 	key_state.map_count = map_count;
 	key_state.dict_flags = dict_flags;
+	key_state.postmap_flags = postmap_flags;
 	key_state.header_done = 0;
 	key_state.found = 0;
 	mime_state =
@@ -781,7 +886,7 @@ static int postmap_queries(VSTREAM *in, char **maps, const int map_count,
 /* postmap_query - query a map and print the result to stdout */
 
 static int postmap_query(const char *map_type, const char *map_name,
-			         const char *key, int dict_flags)
+			 int postmap_flags, const char *key, int dict_flags)
 {
     DICT   *dict;
     const char *value;
@@ -789,15 +894,8 @@ static int postmap_query(const char *map_type, const char *map_name,
     dict = dict_open3(map_type, map_name, O_RDONLY, dict_flags);
     value = ((dict_flags & DICT_FLAG_SRC_RHS_IS_FILE) ?
 	     dict_file_lookup : dict->lookup) (dict, key);
-    if (value != 0) {
-	if (*value == 0) {
-	    msg_warn("table %s:%s: key %s: empty string result is not allowed",
-		     map_type, map_name, key);
-	    msg_warn("table %s:%s should return NO RESULT in case of NOT FOUND",
-		     map_type, map_name);
-	}
-	vstream_printf("%s\n", value);
-    }
+    if (value != 0)
+	write_keyval(map_type, map_name, postmap_flags, 1, key, -1, value, -1);
     switch (dict->error) {
     case 0:
 	break;
@@ -894,7 +992,7 @@ static int postmap_delete(const char *map_type, const char *map_name,
 /* postmap_seq - print all map entries to stdout */
 
 static void postmap_seq(const char *map_type, const char *map_name,
-			        int dict_flags)
+			int postmap_flags, int dict_flags)
 {
     DICT   *dict;
     const char *key;
@@ -907,11 +1005,6 @@ static void postmap_seq(const char *map_type, const char *map_name,
 	    break;
 	if (*key == 0) {
 	    msg_warn("table %s:%s: empty lookup key value is not allowed",
-		     map_type, map_name);
-	} else if (*value == 0) {
-	    msg_warn("table %s:%s: key %s: empty string result is not allowed",
-		     map_type, map_name, key);
-	    msg_warn("table %s:%s should return NO RESULT in case of NOT FOUND",
 		     map_type, map_name);
 	}
 	if (dict_flags & DICT_FLAG_SRC_RHS_IS_FILE) {
@@ -928,7 +1021,7 @@ static void postmap_seq(const char *map_type, const char *map_name,
 	    }
 	    value = STR(unb64);
 	}
-	vstream_printf("%s	%s\n", key, value);
+	write_keyval(map_type, map_name, postmap_flags, 0, key, -1, value, -1);
     }
     if (dict->error)
 	msg_fatal("table %s:%s: sequence error: %m", dict->type, dict->name);
@@ -940,7 +1033,7 @@ static void postmap_seq(const char *map_type, const char *map_name,
 
 static NORETURN usage(char *myname)
 {
-    msg_fatal("usage: %s [-bfFhimnNoprsuUvw] [-c config_dir] [-d key] [-q key] [map_type:]file...",
+    msg_fatal("usage: %s [-bfFhijmnNoprsuUvw] [-c config_dir] [-d key] [-q key] [map_type:]file...",
 	      myname);
 }
 
@@ -1009,7 +1102,7 @@ int     main(int argc, char **argv)
     /*
      * Parse JCL.
      */
-    while ((ch = GETOPT(argc, argv, "bc:d:fFhimnNopq:rsuUvw")) > 0) {
+    while ((ch = GETOPT(argc, argv, "bc:d:fFhijmnNopq:rsuUvw")) > 0) {
 	switch (ch) {
 	default:
 	    usage(argv[0]);
@@ -1044,6 +1137,9 @@ int     main(int argc, char **argv)
 		msg_fatal("specify only one of -d -i -q or -s");
 	    update = 1;
 	    open_flags &= ~O_TRUNC;
+	    break;
+	case 'j':
+	    postmap_flags |= POSTMAP_FLAG_JSON_OUT;
 	    break;
 	case 'm':
 	    postmap_flags |= POSTMAP_FLAG_MIME_KEY;
@@ -1102,6 +1198,8 @@ int     main(int argc, char **argv)
 	&& (postmap_flags & POSTMAP_FLAG_ANY_KEY)
 	== (postmap_flags & POSTMAP_FLAG_MIME_KEY))
 	msg_warn("ignoring -m option without -b or -h");
+    if (query == 0 && sequence == 0 && (postmap_flags & POSTMAP_FLAG_JSON_OUT))
+	msg_warn("ignoring -j option without -q or -s");
     if ((postmap_flags & (POSTMAP_FLAG_ANY_KEY & ~POSTMAP_FLAG_MIME_KEY))
 	&& force_utf8 == 0)
 	dict_flags &= ~DICT_FLAG_UTF8_MASK;
@@ -1136,11 +1234,11 @@ int     main(int argc, char **argv)
 			  postmap_flags, dict_flags | DICT_FLAG_LOCK) == 0);
 	while (optind < argc) {
 	    if ((path_name = split_at(argv[optind], ':')) != 0) {
-		found = postmap_query(argv[optind], path_name, query,
-				      dict_flags | DICT_FLAG_LOCK);
+		found = postmap_query(argv[optind], path_name, postmap_flags,
+				      query, dict_flags | DICT_FLAG_LOCK);
 	    } else {
-		found = postmap_query(var_db_type, argv[optind], query,
-				      dict_flags | DICT_FLAG_LOCK);
+		found = postmap_query(var_db_type, argv[optind], postmap_flags,
+				      query, dict_flags | DICT_FLAG_LOCK);
 	    }
 	    if (found)
 		exit(0);
@@ -1150,10 +1248,10 @@ int     main(int argc, char **argv)
     } else if (sequence) {
 	while (optind < argc) {
 	    if ((path_name = split_at(argv[optind], ':')) != 0) {
-		postmap_seq(argv[optind], path_name,
+		postmap_seq(argv[optind], path_name, postmap_flags,
 			    dict_flags | DICT_FLAG_LOCK);
 	    } else {
-		postmap_seq(var_db_type, argv[optind],
+		postmap_seq(var_db_type, argv[optind], postmap_flags,
 			    dict_flags | DICT_FLAG_LOCK);
 	    }
 	    exit(0);
