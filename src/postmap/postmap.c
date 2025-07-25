@@ -7,7 +7,7 @@
 /* .fi
 /*	\fBpostmap\fR [\fB-bfFhimnNoprsuUvw\fR] [\fB-c \fIconfig_dir\fR]
 /*	[\fB-d \fIkey\fR] [\fB-q \fIkey\fR]
-/*		[\fIfile_type\fR:]\fIfile_name\fR ...
+/*	[\fIfile_type\fR:]\fIfile_name\fR ...
 /* DESCRIPTION
 /*	The \fBpostmap\fR(1) command creates or queries one or more Postfix
 /*	lookup tables, or updates an existing one.
@@ -24,11 +24,13 @@
 /* .fi
 /*	The format of a lookup table input file is as follows:
 /* .IP \(bu
-/*	A table entry has the form
-/* .sp
+/*	A table entry has the form:
+/* .RS
+/* .IP
 /* .nf
-/*	     \fIkey\fR whitespace \fIvalue\fR
+/*	\fIkey\fR whitespace \fIvalue\fR
 /* .fi
+/* .RE
 /* .IP \(bu
 /*	Empty lines and whitespace-only lines are ignored, as
 /*	are lines whose first non-whitespace character is a `#'.
