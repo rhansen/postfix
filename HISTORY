@@ -29445,12 +29445,12 @@ Apologies for any names omitted.
 20250728
 
 	Documentation: in the postmap(1) manual page, fix the caveat
-	for the '-h' option. Robert Hansen. File: postmap/postmap.c.
+	for the '-h' option. Richard Hansen. File: postmap/postmap.c.
 
 	Documentation: make MULTI_INSTANCE_README terminology
 	(default and non-default instances) consistent with
 	postmulti(1) terminology (primary and secondary instances).
-	Robert Hansen. File: proto/MULTI_INSTANCE_README.html.
+	Richard Hansen. File: proto/MULTI_INSTANCE_README.html.
 
 	Documentation: clarify vstring(3) handling of functions
 	that expect null-terminated inputs. File: util/vstring.c.
