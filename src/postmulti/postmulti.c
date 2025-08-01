@@ -108,7 +108,7 @@
 /*	Reverse the iteration order. This may be appropriate when
 /*	updating a multi-instance system, where "sink" instances
 /*	are started before "source" instances.
-/* .sp
+/*
 /*	This option cannot be used with \fB-p\fR.
 /* List mode
 /* .ad
@@ -225,7 +225,7 @@
 /*	"\fB-G \fIgroup\fR" option may be specified to assign the
 /*	instance to a group, otherwise, the new instance is not a
 /*	member of any group.
-/* .sp
+/*
 /*	The new instance main.cf is the stock main.cf with the
 /*	parameters that specify the locations of shared files cloned
 /*	from the primary instance.  For "nameless" instances, you
@@ -233,7 +233,7 @@
 /*	"logtag" starting with "postfix-" that will uniquely identify
 /*	the instance in the mail logs. It is simpler to assign the
 /*	instance a short name with the "\fB-I \fIname\fR" option.
-/* .sp
+/*
 /*	Optional "name=value" arguments specify the instance
 /*	config_directory, queue_directory and data_directory.
 /*	For example:
@@ -252,7 +252,7 @@
 /*	attempts to generate the missing pathname(s) by taking the
 /*	corresponding primary instance pathname, and replacing the
 /*	last pathname component by the value of the \fB-I\fR option.
-/* .sp
+/*
 /*	If the instance configuration directory already exists, and
 /*	contains both a main.cf and master.cf file, \fBcreate\fR
 /*	will "import" the instance as-is. For existing instances,
@@ -274,7 +274,7 @@
 /*	queue must not contain any messages. Attempts to destroy
 /*	the primary Postfix instance trigger a fatal error, without
 /*	destroying the instance.
-/* .sp
+/*
 /*	The instance is removed from the primary instance main.cf
 /*	file's alternate_config_directories parameter and its data,
 /*	queue and configuration directories are cleaned of files
@@ -283,7 +283,7 @@
 /*	directory even if they have been modified since initial
 /*	creation. Finally, the instance is "deported" from the list
 /*	of managed instances.
-/* .sp
+/*
 /*	If other files are present in instance private directories,
 /*	the directories may not be fully removed, a warning is
 /*	logged to alert the administrator. It is expected that an
@@ -293,7 +293,7 @@
 /*	directories are populated with additional files	(access and
 /*	rewriting tables, chroot jail content, etc.) the instance
 /*	directories will not be fully removed.
-/* .sp
+/*
 /*	The \fBdestroy\fR action triggers potentially dangerous
 /*	file removal operations. Make sure the instance's data,
 /*	queue and configuration directories are set correctly and
