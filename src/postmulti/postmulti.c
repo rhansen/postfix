@@ -4,9 +4,7 @@
 /* SUMMARY
 /*	Postfix multi-instance manager
 /* SYNOPSIS
-/* .fi
-/* .ti -4
-/*	\fBIterator modes\fR
+/* .SS "Iterator modes"
 /*
 /*	\fBpostmulti\fR \fB-l\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
 /*	[\fB-i \fIname\fR]
@@ -17,8 +15,7 @@
 /*	\fBpostmulti\fR \fB-x\fR [\fB-aRv\fR] [\fB-g \fIgroup\fR]
 /*	[\fB-i \fIname\fR] \fIunix-command\fR ...
 /*
-/* .ti -4
-/*	\fBLife-cycle management modes\fR
+/* .SS "Life-cycle management modes"
 /*
 /*	\fBpostmulti\fR \fB-e init\fR [\fB-v\fR]
 /*
@@ -43,9 +40,7 @@
 /* DESCRIPTION
 /*	The \fBpostmulti\fR(1) command allows a Postfix administrator
 /*	to manage multiple Postfix instances on a single host.
-/* Background
-/* .ad
-/* .fi
+/* .SS Background
 /*	A multi-instance configuration consists of one primary
 /*	Postfix instance, and one or more secondary instances whose
 /*	configuration directory pathnames are recorded in the primary
@@ -62,9 +57,7 @@
 /*
 /*	See the MULTI_INSTANCE_README tutorial for a more detailed
 /*	discussion of multi-instance management with \fBpostmulti\fR(1).
-/* Modes of operation
-/* .ad
-/* .fi
+/* .SS "Modes of operation"
 /*	\fBpostmulti\fR(1) has several modes of operation, grouped
 /*	into two general categories: \fIiterator\fR modes and
 /*	\fIlife-cycle management\fR modes.
@@ -75,9 +68,7 @@
 /*
 /*	Each mode of operation has its own command syntax. For this
 /*	reason, each mode is documented in separate sections below.
-/* Common options
-/* .ad
-/* .fi
+/* .SS "Common options"
 /*	All modes support the following options:
 /* .IP \fB-v\fR
 /*	Enable verbose logging for debugging purposes. Multiple
@@ -91,9 +82,7 @@
 /*
 /*	If multi-instance support is not enabled, the requested
 /*	command is performed just for the primary instance.
-/* Common options for iterator modes
-/* .ad
-/* .fi
+/* .SS "Common options for iterator modes"
 /*	The following instance selection options are common among the
 /*	iterator modes:
 /* .IP \fB-a\fR
@@ -110,15 +99,11 @@
 /*	are started before "source" instances.
 /*
 /*	This option cannot be used with \fB-p\fR.
-/* List mode
-/* .ad
-/* .fi
+/* .SS "List mode"
 /* .IP \fB-l\fR
 /*	List Postfix instances with their instance name, instance
 /*	group name, enable/disable status and configuration directory.
-/* Postfix-wrapper mode
-/* .ad
-/* .fi
+/* .SS "Postfix-wrapper mode"
 /* .IP "\fB-p \fIpostfix-command\fR"
 /*	Invoke \fBpostfix\fR(1) to execute \fIpostfix-command\fR.
 /*	This option implements the \fBpostfix-wrapper\fR(5) interface.
@@ -151,9 +136,7 @@
 /*	# postmulti -g msa -p start
 /* .fi
 /* .RE
-/* Command mode
-/* .ad
-/* .fi
+/* .SS "Command mode"
 /* .IP "\fB-x \fIunix-command\fR"
 /*	Execute the specified \fIunix-command\fR for all Postfix instances.
 /*	The command runs with appropriate environment settings for
@@ -167,9 +150,7 @@
 /*	With the \fB-e\fR option, \fBpostmulti\fR(1) can be used to
 /*	add or delete a Postfix instance, and to manage the
 /*	multi-instance status of an existing instance.
-/* Common options for life-cycle management modes
-/* .ad
-/* .fi
+/* .SS "Common options for life-cycle management modes"
 /*	The following options are common among various life-cycle
 /*	management modes:
 /* .IP \fB-a\fR
@@ -198,9 +179,7 @@
 /* .IP "\fB-G \fIgroup\fR"
 /*	For \fBcreate\fR, \fBimport\fR, \fBassign\fR: Assign the
 /*	specified \fIgroup\fR name to the instance.
-/* Mode selection
-/* .ad
-/* .fi
+/* .SS "Mode selection"
 /* .IP "\fB-e init\fR"
 /*	This command is required before \fBpostmulti\fR(1) can be
 /*	used to manage Postfix instances.  The "postmulti -e init"
