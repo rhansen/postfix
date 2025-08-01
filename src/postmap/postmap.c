@@ -73,7 +73,7 @@
 /*	from standard input with "\fB-q -\fR", process the input
 /*	as if it is an email message in RFC 5322 format.  Each line
 /*	of body content becomes one lookup key.
-/* .sp
+/*
 /*	By default, the \fB-b\fR option starts generating lookup
 /*	keys at the first non-header line, and stops when the end
 /*	of the message is reached.
@@ -81,12 +81,12 @@
 /*	parsing with \fB-m\fR. With this, the \fB-b\fR option
 /*	generates no body-style lookup keys for attachment MIME
 /*	headers and for attached message/* headers.
-/* .sp
+/*
 /*	NOTE: with "smtputf8_enable = yes", the \fB-b\fR option
 /*	disables UTF-8 syntax checks on query keys and lookup
 /*	results. Specify the \fB-U\fR option to force UTF-8
 /*	syntax checks anyway.
-/* .sp
+/*
 /*	This feature is available in Postfix version 2.6 and later.
 /* .IP "\fB-c \fIconfig_dir\fR"
 /*	Read the \fBmain.cf\fR configuration file in the named directory
@@ -111,7 +111,7 @@
 /*	value as a list of filenames, concatenate the content of
 /*	those files, and store the base64-encoded result instead
 /*	of the value (see INPUT FILE FORMAT for details).
-/* .sp
+/*
 /*	This feature is available in Postfix version 3.4 and later.
 /* .IP \fB-h\fR
 /*	Enable message header query mode. When reading lookup keys
@@ -120,19 +120,19 @@
 /*	logical header line becomes one lookup key. A multi-line
 /*	header becomes one lookup key with one or more embedded
 /*	newline characters.
-/* .sp
+/*
 /*	By default, the \fB-h\fR option generates lookup keys until
 /*	the first non-header line is reached.
 /*	To simulate \fBheader_checks\fR(5) processing, enable MIME
 /*	parsing with \fB-m\fR. With this, the \fB-h\fR option also
 /*	generates header-style lookup keys for attachment MIME
 /*	headers and for attached message/* headers.
-/* .sp
+/*
 /*	NOTE: with "smtputf8_enable = yes", the \fB-h\fR option
 /*	disables UTF-8 syntax checks on query keys and lookup results.
 /*	Specify the \fB-U\fR option to force UTF-8 syntax checks
 /*	anyway.
-/* .sp
+/*
 /*	This feature is available in Postfix version 2.6 and later.
 /* .IP \fB-i\fR
 /*	Incremental mode. Read entries from standard input and do not
@@ -140,7 +140,7 @@
 /*	a new database from the entries in \fBfile_name\fR.
 /* .IP \fB-m\fR
 /*	Enable MIME parsing with "\fB-b\fR" and "\fB-h\fR".
-/* .sp
+/*
 /*	This feature is available in Postfix version 2.6 and later.
 /* .IP \fB-N\fR
 /*	Include the terminating null character that terminates lookup keys
@@ -182,7 +182,7 @@
 /*	\fIkey value\fR output for each element. The elements are
 /*	printed in database order, which is not necessarily the same
 /*	as the original input order.
-/* .sp
+/*
 /*	This feature is available in Postfix version 2.2 and later,
 /*	and is not available for all database types.
 /* .IP \fB-u\fR
